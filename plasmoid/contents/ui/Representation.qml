@@ -7,6 +7,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 RowLayout {
     id: fullView
     focus: true
+    visible: mediaSource.loaded ? true : false
     Keys.onReleased: {
         if (!event.modifiers) {
             event.accepted = true

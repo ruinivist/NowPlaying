@@ -77,7 +77,7 @@ RowLayout {
                     id: playButton
                     contentItem: PlasmaCore.IconItem {
                         source: mediaSource.playbackStatus
-                                === "Playing" ? "media-playback-start" : "media-playback-pause"
+                                === "Paused" ? "media-playback-start" : "media-playback-pause"
                     }
                     padding: 0
                     background: null

@@ -1,4 +1,7 @@
 # NowPlaying
+
+## now on kde 6: https://www.pling.com/p/2195583/
+
 A KDE Plasma widget inspired from the Cleartext rainmeter widget. Still in beta.
 
 Hello,\

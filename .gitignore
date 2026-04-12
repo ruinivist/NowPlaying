@@ -1,0 +1,26 @@
+# KDE / Qt
+.kdev4/
+*.kdev4
+.directory
+*.user
+*.pro.user
+*.moc
+*.o
+*.obj
+*.rcc
+*.ui
+*.qrc
+.qmake.stash
+
+# Build artifacts
+build/
+*.plasmoid
+
+# Temporary files
+*~
+*.swp
+*.bak
+.DS_Store
+
+# Logs
+*.log

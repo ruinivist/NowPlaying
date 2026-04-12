@@ -16,6 +16,6 @@
     },
     "KPackageStructure": "Plasma/Applet",
     "X-Plasma-API-Minimum-Version": "6.0",
-    "X-Plasma-Provides": [ "org.kde.plasma.multimediacontrols" ],
+    "X-Plasma-Provides": ["org.kde.plasma.multimediacontrols"],
     "X-Plasma-DBusActivationService": "org.mpris.MediaPlayer2.*"
 }

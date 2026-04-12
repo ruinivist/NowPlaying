@@ -1,0 +1,5 @@
+{
+    "qt-qml.qmlls.enabled": true,
+    "qt-qml.qmlls.customExePath": "/usr/lib/qt6/bin/qmlls",
+    "qt-qml.qmlls.customArgs": ["-I/usr/lib/qt6/qml", "-d/usr/share/doc/qt6"]
+}

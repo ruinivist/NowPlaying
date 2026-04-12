@@ -1,12 +1,95 @@
 # NowPlaying
 
-## now on kde 6: https://www.pling.com/p/2195583/
+NowPlaying is a KDE Plasma 6 widget inspired by the Cleartext Rainmeter widget. It displays the current song and artist with compact media controls, and is meant to live on the desktop rather than in a panel.
 
-A KDE Plasma widget inspired from the Cleartext rainmeter widget. Still in beta.
+Now on KDE 6: https://www.pling.com/p/2195583/
 
-Hello,\
-Full credit to the guy windows guy for the idea, I just made a clone.\
-Now of course, it is not as feature fledged (read as no features) as that one but I aim to add most, if not all of it, if time permits.\
-Feel free to open any issues, requests, suggestions etc.
+## Prerequisites
 
-PS: Don't forget to star the project. I care about fake internet points.
+You need the basic KDE and Qt 6 tools for Plasma widget development.
+
+On Arch Linux, this is roughly:
+
+```bash
+sudo pacman -S plasma-sdk inotify-tools kirigami2 qt6-base qt6-declarative
+```
+
+## Development
+
+Run the widget directly from the local package:
+
+```bash
+make dev
+```
+
+Other test modes are available:
+
+```bash
+make dev MODE=panel
+make dev MODE=desktop
+make dev MODE=hidpi
+```
+
+Use hot reload while editing:
+
+```bash
+make watch
+```
+
+Install or upgrade the widget in your local Plasma package store:
+
+```bash
+make install
+```
+
+Create a distributable package:
+
+```bash
+make package
+```
+
+The package is written to `build/org.ruiny.NowPlaying.plasmoid`.
+
+## Project Structure
+
+```text
+.
+├── package/
+│   ├── metadata.json
+│   └── contents/
+│       ├── config/
+│       │   ├── config.qml
+│       │   └── main.xml
+│       └── ui/
+│           ├── configGeneral.qml
+│           ├── main.qml
+│           ├── Player.qml
+│           └── Representation.qml
+├── scripts/
+│   └── watch.sh
+└── Makefile
+```
+
+## Maintenance
+
+Format files:
+
+```bash
+make format
+```
+
+Run lint checks:
+
+```bash
+make lint
+```
+
+Enable the repository pre-commit hook:
+
+```bash
+make hooks-install
+```
+
+## Credits
+
+Full credit to the Windows creator for the original idea. I just made a KDE clone.

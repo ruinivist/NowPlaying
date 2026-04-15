@@ -4,6 +4,8 @@ NowPlaying is a KDE Plasma 6 widget inspired by the Cleartext Rainmeter widget. 
 
 Now on KDE 6: https://www.pling.com/p/2195583/
 
+> Too little too late but I plan to update it regularly now if any issues are created - ruinivist
+
 ## Prerequisites
 
 You need the basic KDE and Qt 6 tools for Plasma widget development.

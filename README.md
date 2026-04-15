@@ -90,6 +90,20 @@ Enable the repository pre-commit hook:
 make hooks-install
 ```
 
+## Release Upload
+
+Required GitHub repository secrets:
+
+- `PLING_PROJECT_ID`
+- `PLING_USERNAME`
+- `PLING_PASSWORD`
+
+To dry run
+
+```bash
+uv run --env-file .env python scripts/pling_upload.py --dry-run
+```
+
 ## Credits
 
 Full credit to the Windows creator for the original idea. I just made a KDE clone.

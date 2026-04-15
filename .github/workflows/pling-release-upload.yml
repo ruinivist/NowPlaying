@@ -1,0 +1,72 @@
+name: Pling Release Package Upload
+
+on:
+  push:
+    tags:
+      - "release*"
+
+jobs:
+  upload-to-pling:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PLING_PROJECT_ID: ${{ secrets.PLING_PROJECT_ID }}
+      PLING_USERNAME: ${{ secrets.PLING_USERNAME }}
+      PLING_PASSWORD: ${{ secrets.PLING_PASSWORD }}
+      PLING_BASE_URL: https://www.opendesktop.org
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends zip
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for var in PLING_PROJECT_ID PLING_USERNAME PLING_PASSWORD; do
+            if [ -z "${!var:-}" ]; then
+              echo "::error::Missing required secret: $var"
+              exit 1
+            fi
+          done
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Build and package plasmoid
+        shell: bash
+        run: |
+          set -euo pipefail
+          make package
+
+          widget_id="$(python -c 'import json; from pathlib import Path; m=json.loads(Path("package/metadata.json").read_text(encoding="utf-8")); print((m.get("KPlugin") or {}).get("Id") or m.get("Id") or "")')"
+          if [ -z "$widget_id" ]; then
+            echo "::error::Could not resolve widget id from package/metadata.json (expected KPlugin.Id)"
+            exit 1
+          fi
+          artifact_path="build/${widget_id}.plasmoid"
+
+          if [ ! -f "$artifact_path" ]; then
+            echo "::error::Expected plasmoid artifact was not created: $artifact_path"
+            exit 1
+          fi
+
+          echo "PLASMOID_ARTIFACT=$artifact_path" >> "$GITHUB_ENV"
+          echo "Packaged artifact: $artifact_path"
+
+      - name: Upload packaged extension to Pling
+        run: uv run python scripts/pling_upload.py -f "$PLASMOID_ARTIFACT"

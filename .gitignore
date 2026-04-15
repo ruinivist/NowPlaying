@@ -24,3 +24,6 @@ build/
 
 # Logs
 *.log
+
+# Local environment files
+.env

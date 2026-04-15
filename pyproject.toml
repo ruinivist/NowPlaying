@@ -1,0 +1,7 @@
+[project]
+name = "nowplaying"
+version = "1.0.0"
+requires-python = ">=3.13"
+dependencies = [
+    "niquests>=3.18.5",
+]

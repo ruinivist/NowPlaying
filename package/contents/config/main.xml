@@ -13,5 +13,33 @@
             <label>Font family</label>
             <default>Noto Sans</default>
         </entry>
+        <entry name="labelVisibilityMode" type="String">
+            <label>Now Playing label visibility mode</label>
+            <default>auto</default>
+        </entry>
+        <entry name="labelPlacement" type="String">
+            <label>Now Playing label placement</label>
+            <default>left</default>
+        </entry>
+        <entry name="backgroundStyle" type="String">
+            <label>Background style</label>
+            <default>custom</default>
+        </entry>
+        <entry name="backgroundColor" type="String">
+            <label>Background color</label>
+            <default>transparent</default>
+        </entry>
+        <entry name="backgroundRadius" type="Int">
+            <label>Background radius</label>
+            <default>0</default>
+        </entry>
+        <entry name="foregroundColor" type="String">
+            <label>Foreground color</label>
+            <default>white</default>
+        </entry>
+        <entry name="textShadowEnabled" type="Bool">
+            <label>Enable text shadow</label>
+            <default>false</default>
+        </entry>
     </group>
 </kcfg>

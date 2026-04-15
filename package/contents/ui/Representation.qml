@@ -7,7 +7,35 @@ import org.kde.plasma.components as PlasmaComponents
 MouseArea {
     id: mediaControlsMouseArea
 
+    property string configuredFontFamily: "Noto Sans"
+    property string configuredLabelVisibilityMode: "auto"
+    property string configuredLabelPlacement: "left"
+    property string configuredBackgroundStyle: "custom"
+    property string configuredBackgroundColor: "transparent"
+    property int configuredBackgroundRadius: 0
+    property string configuredForegroundColor: "white"
+    property bool configuredTextShadowEnabled: false
     readonly property double buttonSize: 16
+    readonly property string effectiveLabelVisibilityMode: configuredLabelVisibilityMode === "always" || configuredLabelVisibilityMode === "never" ? configuredLabelVisibilityMode : "auto"
+    readonly property bool labelsOnRight: configuredLabelPlacement === "right"
+    readonly property bool hideNowPlayingArea: effectiveLabelVisibilityMode === "never"
+    readonly property bool usesCustomBackground: configuredBackgroundStyle === "custom"
+    readonly property int hideModeHorizontalPadding: 8
+    readonly property int labelRailWidth: 100
+    readonly property int separatorPadding: 4
+    readonly property string effectiveBackgroundColor: configuredBackgroundColor || "transparent"
+    readonly property int effectiveBackgroundRadius: Math.max(0, configuredBackgroundRadius)
+    readonly property string effectiveForegroundColor: configuredForegroundColor || "white"
+    readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
+    readonly property bool nowPlayingLabelsVisible: {
+        if (effectiveLabelVisibilityMode === "always")
+            return true;
+
+        if (effectiveLabelVisibilityMode === "never")
+            return false;
+
+        return hasTrackInfo;
+    }
 
     focus: true
     hoverEnabled: true
@@ -25,13 +53,25 @@ MouseArea {
         }
     }
 
+    Rectangle {
+        anchors.fill: parent
+        visible: mediaControlsMouseArea.usesCustomBackground
+        color: mediaControlsMouseArea.effectiveBackgroundColor
+        radius: mediaControlsMouseArea.effectiveBackgroundRadius
+    }
+
     RowLayout {
         anchors.fill: parent
+        layoutDirection: mediaControlsMouseArea.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
         ColumnLayout {
             id: leftColumn
 
+            visible: !mediaControlsMouseArea.hideNowPlayingArea
             Layout.fillHeight: true
+            Layout.minimumWidth: visible ? mediaControlsMouseArea.labelRailWidth : 0
+            Layout.preferredWidth: visible ? mediaControlsMouseArea.labelRailWidth : 0
+            Layout.maximumWidth: visible ? mediaControlsMouseArea.labelRailWidth : 0
             states: [
                 State {
                     name: "buttonsVisible"
@@ -63,29 +103,34 @@ MouseArea {
             ColumnLayout {
                 id: nowPlayingLabels
 
-                Layout.alignment: Qt.AlignRight
+                Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
                 spacing: 0
+                visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
-                PlasmaComponents.Label {
-                    Layout.alignment: Qt.AlignRight
+                ShadowedLabel {
+                    Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                    shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                     text: "NOW"
                     lineHeight: 0.8
                     font.pixelSize: 16
                     font.bold: true
-                    // qmllint disable missing-property
-                    font.family: plasmoid.configuration.fontFamily
+                    font.family: mediaControlsMouseArea.configuredFontFamily
+                    color: mediaControlsMouseArea.effectiveForegroundColor
+                    horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
                 }
 
-                PlasmaComponents.Label {
+                ShadowedLabel {
                     id: nowPlayingLabel2
 
-                    Layout.alignment: Qt.AlignRight
+                    Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                    shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                     text: "PLAYING"
                     lineHeight: 0.8
                     font.bold: true
                     font.pixelSize: 16
-                    // qmllint disable missing-property
-                    font.family: plasmoid.configuration.fontFamily
+                    font.family: mediaControlsMouseArea.configuredFontFamily
+                    color: mediaControlsMouseArea.effectiveForegroundColor
+                    horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
                 }
 
             }
@@ -93,9 +138,9 @@ MouseArea {
             RowLayout {
                 id: mediaControls
 
-                Layout.alignment: Qt.AlignHCenter
-                opacity: mediaControlsMouseArea.containsMouse ? 1 : 0
-                visible: opacity > 0
+                Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                opacity: mediaControlsMouseArea.containsMouse && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
+                visible: opacity > 0 && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize
@@ -109,6 +154,7 @@ MouseArea {
 
                     contentItem: Kirigami.Icon {
                         source: "media-skip-backward"
+                        color: mediaControlsMouseArea.effectiveForegroundColor
                     }
 
                 }
@@ -127,6 +173,7 @@ MouseArea {
 
                     contentItem: Kirigami.Icon {
                         source: player.playbackStatus === 2 ? "media-playback-pause" : "media-playback-start"
+                        color: mediaControlsMouseArea.effectiveForegroundColor
                     }
 
                 }
@@ -140,6 +187,7 @@ MouseArea {
 
                     contentItem: Kirigami.Icon {
                         source: "media-skip-forward"
+                        color: mediaControlsMouseArea.effectiveForegroundColor
                     }
 
                 }
@@ -173,37 +221,93 @@ MouseArea {
         Rectangle {
             id: separator
 
+            visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
             Layout.fillHeight: true
-            width: 1
+            Layout.leftMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
+            Layout.rightMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
+            Layout.topMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
+            Layout.bottomMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
+            Layout.minimumWidth: visible ? 1 : 0
+            Layout.preferredWidth: visible ? 1 : 0
+            Layout.maximumWidth: visible ? 1 : 0
+            color: mediaControlsMouseArea.effectiveForegroundColor
         }
 
         ColumnLayout {
             id: infoColumn
 
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
+            Layout.leftMargin: mediaControlsMouseArea.hideNowPlayingArea ? mediaControlsMouseArea.hideModeHorizontalPadding : 0
+            Layout.rightMargin: mediaControlsMouseArea.hideNowPlayingArea ? mediaControlsMouseArea.hideModeHorizontalPadding : 0
 
-            PlasmaComponents.Label {
+            ShadowedLabel {
                 Layout.fillWidth: true
+                shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                 text: player.title
                 font.pixelSize: 28
                 font.bold: true
-                // qmllint disable missing-property
-                font.family: plasmoid.configuration.fontFamily
+                font.family: mediaControlsMouseArea.configuredFontFamily
+                color: mediaControlsMouseArea.effectiveForegroundColor
                 lineHeight: 0.8
                 elide: Text.ElideRight
+                horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
 
-            PlasmaComponents.Label {
+            ShadowedLabel {
                 Layout.maximumWidth: 300
                 Layout.fillWidth: true
+                Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
+                shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                 text: player.artists
                 font.pixelSize: 26
-                // qmllint disable missing-property
-                font.family: plasmoid.configuration.fontFamily
+                font.family: mediaControlsMouseArea.configuredFontFamily
+                color: mediaControlsMouseArea.effectiveForegroundColor
                 lineHeight: 0.8
                 elide: Text.ElideRight
+                horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
 
+        }
+
+    }
+
+    component ShadowedLabel: Item {
+        id: shadowedLabel
+
+        property alias text: foregroundLabel.text
+        property alias font: foregroundLabel.font
+        property alias lineHeight: foregroundLabel.lineHeight
+        property alias elide: foregroundLabel.elide
+        property alias horizontalAlignment: foregroundLabel.horizontalAlignment
+        property alias verticalAlignment: foregroundLabel.verticalAlignment
+        property alias color: foregroundLabel.color
+        property bool shadowEnabled: false
+
+        implicitWidth: foregroundLabel.implicitWidth + (shadowEnabled ? 1 : 0)
+        implicitHeight: foregroundLabel.implicitHeight + (shadowEnabled ? 1 : 0)
+
+        PlasmaComponents.Label {
+            id: shadowLabel
+
+            visible: shadowedLabel.shadowEnabled
+            x: 1
+            y: 1
+            width: foregroundLabel.width
+            height: foregroundLabel.height
+            text: foregroundLabel.text
+            font: foregroundLabel.font
+            lineHeight: foregroundLabel.lineHeight
+            elide: foregroundLabel.elide
+            horizontalAlignment: foregroundLabel.horizontalAlignment
+            verticalAlignment: foregroundLabel.verticalAlignment
+            color: "#99000000"
+        }
+
+        PlasmaComponents.Label {
+            id: foregroundLabel
+
+            anchors.fill: parent
         }
 
     }

@@ -174,7 +174,7 @@ MouseArea {
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
                 enabled: mediaControlsMouseArea.controlsHoverActive
                 opacity: mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
-                visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
+                visible: mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize

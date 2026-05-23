@@ -67,6 +67,33 @@ KCM.SimpleKCM {
         return options[resolvedIndex].value;
     }
 
+    component SectionHeader: Item {
+        required property string title
+        Kirigami.FormData.isSection: true
+        implicitHeight: sectionLayout.implicitHeight
+
+        ColumnLayout {
+            id: sectionLayout
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: Kirigami.Units.smallSpacing
+
+            QQC2.Label {
+                text: parent.parent.title
+                font.bold: true
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 1
+                color: Kirigami.Theme.textColor
+                opacity: 0.25
+            }
+
+        }
+
+    }
+
     onCfg_fontFamilyChanged: {
         const index = availableFonts.indexOf(cfg_fontFamily);
         if (index >= 0 && fontFamilyComboBox.currentIndex !== index)
@@ -93,6 +120,10 @@ KCM.SimpleKCM {
     }
 
     Kirigami.FormLayout {
+        SectionHeader {
+            title: i18n("Global")
+        }
+
         QQC2.SpinBox {
             id: opacitySpinBox
 
@@ -107,60 +138,6 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Font:")
             model: configRoot.availableFonts
             onActivated: configRoot.cfg_fontFamily = currentText
-        }
-
-        QQC2.SpinBox {
-            id: labelFontSizeSpinBox
-
-            Kirigami.FormData.label: i18n("Label font size:")
-            from: 8
-            to: 72
-        }
-
-        QQC2.SpinBox {
-            id: titleFontSizeSpinBox
-
-            Kirigami.FormData.label: i18n("Title font size:")
-            from: 8
-            to: 96
-        }
-
-        QQC2.SpinBox {
-            id: artistFontSizeSpinBox
-
-            Kirigami.FormData.label: i18n("Artist font size:")
-            from: 8
-            to: 96
-        }
-
-        QQC2.ComboBox {
-            id: labelVisibilityModeComboBox
-
-            Kirigami.FormData.label: i18n("Now Playing labels:")
-            model: configRoot.labelVisibilityOptions
-            textRole: "text"
-            valueRole: "value"
-            onActivated: configRoot.cfg_labelVisibilityMode = currentValue
-        }
-
-        QQC2.ComboBox {
-            id: labelPlacementComboBox
-
-            Kirigami.FormData.label: i18n("Label placement:")
-            model: configRoot.labelPlacementOptions
-            textRole: "text"
-            valueRole: "value"
-            onActivated: configRoot.cfg_labelPlacement = currentValue
-        }
-
-        QQC2.TextArea {
-            id: labelTextArea
-
-            Kirigami.FormData.label: i18n("Label text:")
-            Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-            placeholderText: i18n("Use a line break for multiple lines")
-            wrapMode: TextEdit.NoWrap
         }
 
         QQC2.ComboBox {
@@ -231,11 +208,53 @@ KCM.SimpleKCM {
         }
 
         QQC2.SpinBox {
-            id: trackTextVerticalSpacingSpinBox
+            id: separatorHeightSpinBox
 
-            Kirigami.FormData.label: i18n("Title/artist spacing (negatives possible):")
-            from: -200
-            to: 200
+            Kirigami.FormData.label: i18n("Separator height (%):")
+            from: 0
+            to: 100
+        }
+
+        SectionHeader {
+            title: i18n("Label")
+        }
+
+        QQC2.ComboBox {
+            id: labelVisibilityModeComboBox
+
+            Kirigami.FormData.label: i18n("Now Playing labels:")
+            model: configRoot.labelVisibilityOptions
+            textRole: "text"
+            valueRole: "value"
+            onActivated: configRoot.cfg_labelVisibilityMode = currentValue
+        }
+
+        QQC2.ComboBox {
+            id: labelPlacementComboBox
+
+            Kirigami.FormData.label: i18n("Label placement:")
+            model: configRoot.labelPlacementOptions
+            textRole: "text"
+            valueRole: "value"
+            onActivated: configRoot.cfg_labelPlacement = currentValue
+        }
+
+        QQC2.TextArea {
+            id: labelTextArea
+
+            Kirigami.FormData.label: i18n("Label text:")
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            placeholderText: i18n("Use a line break for multiple lines")
+            wrapMode: TextEdit.NoWrap
+        }
+
+        QQC2.SpinBox {
+            id: labelFontSizeSpinBox
+
+            Kirigami.FormData.label: i18n("Label font size:")
+            from: 8
+            to: 72
         }
 
         QQC2.SpinBox {
@@ -254,20 +273,40 @@ KCM.SimpleKCM {
             to: 24
         }
 
+        SectionHeader {
+            title: i18n("Track & Artist")
+        }
+
+        QQC2.SpinBox {
+            id: titleFontSizeSpinBox
+
+            Kirigami.FormData.label: i18n("Title font size:")
+            from: 8
+            to: 96
+        }
+
+        QQC2.SpinBox {
+            id: artistFontSizeSpinBox
+
+            Kirigami.FormData.label: i18n("Artist font size:")
+            from: 8
+            to: 96
+        }
+
+        QQC2.SpinBox {
+            id: trackTextVerticalSpacingSpinBox
+
+            Kirigami.FormData.label: i18n("Title/artist spacing (negatives possible):")
+            from: -200
+            to: 200
+        }
+
         QQC2.SpinBox {
             id: separatorGapTrackSpinBox
 
             Kirigami.FormData.label: i18n("Separator gap from track:")
             from: 0
             to: 24
-        }
-
-        QQC2.SpinBox {
-            id: separatorHeightSpinBox
-
-            Kirigami.FormData.label: i18n("Separator height (%):")
-            from: 0
-            to: 100
         }
 
     }

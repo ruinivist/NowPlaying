@@ -96,6 +96,7 @@ make hooks-install
 
 The widget appearance can be tuned from the Plasma widget settings, including:
 
+- custom multiline label text
 - title/artist vertical spacing
 - NOW/PLAYING label vertical spacing
 - separator gap from labels

@@ -21,6 +21,11 @@
             <label>Now Playing label placement</label>
             <default>left</default>
         </entry>
+        <entry name="labelText" type="String">
+            <label>Now Playing label text</label>
+            <default><![CDATA[NOW
+PLAYING]]></default>
+        </entry>
         <entry name="backgroundStyle" type="String">
             <label>Background style</label>
             <default>custom</default>

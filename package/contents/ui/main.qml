@@ -18,6 +18,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredLabelPlacement: plasmoid.configuration.labelPlacement
     // qmllint disable missing-property
+    property string configuredLabelText: plasmoid.configuration.labelText
+    // qmllint disable missing-property
     property string configuredBackgroundStyle: plasmoid.configuration.backgroundStyle
     // qmllint disable missing-property
     property string configuredBackgroundColor: plasmoid.configuration.backgroundColor
@@ -66,6 +68,7 @@ PlasmoidItem {
         configuredFontFamily: root.configuredFontFamily
         configuredLabelVisibilityMode: root.configuredLabelVisibilityMode
         configuredLabelPlacement: root.configuredLabelPlacement
+        configuredLabelText: root.configuredLabelText
         configuredBackgroundStyle: root.configuredBackgroundStyle
         configuredBackgroundColor: root.configuredBackgroundColor
         configuredBackgroundRadius: root.configuredBackgroundRadius
@@ -86,6 +89,7 @@ PlasmoidItem {
         configuredFontFamily: root.configuredFontFamily
         configuredLabelVisibilityMode: root.configuredLabelVisibilityMode
         configuredLabelPlacement: root.configuredLabelPlacement
+        configuredLabelText: root.configuredLabelText
         configuredBackgroundStyle: root.configuredBackgroundStyle
         configuredBackgroundColor: root.configuredBackgroundColor
         configuredBackgroundRadius: root.configuredBackgroundRadius

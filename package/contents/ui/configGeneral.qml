@@ -12,6 +12,7 @@ KCM.SimpleKCM {
     property string cfg_fontFamily
     property string cfg_labelVisibilityMode
     property string cfg_labelPlacement
+    property alias cfg_labelText: labelTextArea.text
     property string cfg_backgroundStyle
     property alias cfg_backgroundColor: backgroundColorField.text
     property alias cfg_backgroundRadius: backgroundRadiusSpinBox.value
@@ -123,6 +124,16 @@ KCM.SimpleKCM {
             textRole: "text"
             valueRole: "value"
             onActivated: configRoot.cfg_labelPlacement = currentValue
+        }
+
+        QQC2.TextArea {
+            id: labelTextArea
+
+            Kirigami.FormData.label: i18n("Label text:")
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            placeholderText: i18n("Use a line break for multiple lines")
+            wrapMode: TextEdit.NoWrap
         }
 
         QQC2.ComboBox {

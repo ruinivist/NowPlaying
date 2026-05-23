@@ -10,6 +10,7 @@ MouseArea {
     property string configuredFontFamily: "Noto Sans"
     property string configuredLabelVisibilityMode: "auto"
     property string configuredLabelPlacement: "left"
+    property string configuredLabelText: "NOW\nPLAYING"
     property string configuredBackgroundStyle: "custom"
     property string configuredBackgroundColor: "transparent"
     property int configuredBackgroundRadius: 0
@@ -35,6 +36,7 @@ MouseArea {
     readonly property int effectiveSeparatorGapLabel: Math.max(0, configuredSeparatorGapLabel)
     readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
     readonly property int effectiveSeparatorHeight: Math.max(0, Math.min(100, configuredSeparatorHeight))
+    readonly property var effectiveLabelLines: (configuredLabelText || "").split(/\r?\n/)
     readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
     readonly property bool nowPlayingLabelsVisible: {
         if (effectiveLabelVisibilityMode === "always")
@@ -116,30 +118,23 @@ MouseArea {
                 spacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
                 visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
-                ShadowedLabel {
-                    Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                    shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
-                    text: "NOW"
-                    lineHeight: 0.8
-                    font.pixelSize: 16
-                    font.bold: true
-                    font.family: mediaControlsMouseArea.configuredFontFamily
-                    color: mediaControlsMouseArea.effectiveForegroundColor
-                    horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
-                }
+                Repeater {
+                    model: mediaControlsMouseArea.effectiveLabelLines
 
-                ShadowedLabel {
-                    id: nowPlayingLabel2
+                    delegate: ShadowedLabel {
+                        required property string modelData
 
-                    Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                    shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
-                    text: "PLAYING"
-                    lineHeight: 0.8
-                    font.bold: true
-                    font.pixelSize: 16
-                    font.family: mediaControlsMouseArea.configuredFontFamily
-                    color: mediaControlsMouseArea.effectiveForegroundColor
-                    horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
+                        Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                        shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
+                        text: modelData
+                        lineHeight: 0.8
+                        font.bold: true
+                        font.pixelSize: 16
+                        font.family: mediaControlsMouseArea.configuredFontFamily
+                        color: mediaControlsMouseArea.effectiveForegroundColor
+                        horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
+                    }
+
                 }
 
             }

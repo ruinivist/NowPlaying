@@ -15,6 +15,11 @@ MouseArea {
     property int configuredBackgroundRadius: 0
     property string configuredForegroundColor: "white"
     property bool configuredTextShadowEnabled: false
+    property int configuredTrackTextVerticalSpacing: 5
+    property int configuredLabelVerticalSpacing: 0
+    property int configuredSeparatorGapLabel: 4
+    property int configuredSeparatorGapTrack: 4
+    property int configuredSeparatorHeight: 90
     readonly property double buttonSize: 16
     readonly property string effectiveLabelVisibilityMode: configuredLabelVisibilityMode === "always" || configuredLabelVisibilityMode === "never" ? configuredLabelVisibilityMode : "auto"
     readonly property bool labelsOnRight: configuredLabelPlacement === "right"
@@ -22,10 +27,14 @@ MouseArea {
     readonly property bool usesCustomBackground: configuredBackgroundStyle === "custom"
     readonly property int hideModeHorizontalPadding: 8
     readonly property int labelRailWidth: 100
-    readonly property int separatorPadding: 4
     readonly property string effectiveBackgroundColor: configuredBackgroundColor || "transparent"
     readonly property int effectiveBackgroundRadius: Math.max(0, configuredBackgroundRadius)
     readonly property string effectiveForegroundColor: configuredForegroundColor || "white"
+    readonly property int effectiveTrackTextVerticalSpacing: configuredTrackTextVerticalSpacing
+    readonly property int effectiveLabelVerticalSpacing: configuredLabelVerticalSpacing
+    readonly property int effectiveSeparatorGapLabel: Math.max(0, configuredSeparatorGapLabel)
+    readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
+    readonly property int effectiveSeparatorHeight: Math.max(0, Math.min(100, configuredSeparatorHeight))
     readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
     readonly property bool nowPlayingLabelsVisible: {
         if (effectiveLabelVisibilityMode === "always")
@@ -104,7 +113,7 @@ MouseArea {
                 id: nowPlayingLabels
 
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                spacing: 0
+                spacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
                 visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
                 ShadowedLabel {
@@ -218,19 +227,25 @@ MouseArea {
 
         }
 
-        Rectangle {
-            id: separator
+        Item {
+            id: separatorContainer
 
             visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
             Layout.fillHeight: true
-            Layout.leftMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
-            Layout.rightMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
-            Layout.topMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
-            Layout.bottomMargin: visible ? mediaControlsMouseArea.separatorPadding : 0
+            Layout.leftMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapLabel : 0
+            Layout.rightMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapTrack : 0
             Layout.minimumWidth: visible ? 1 : 0
             Layout.preferredWidth: visible ? 1 : 0
             Layout.maximumWidth: visible ? 1 : 0
-            color: mediaControlsMouseArea.effectiveForegroundColor
+
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                width: 1
+                height: Math.round(parent.height * mediaControlsMouseArea.effectiveSeparatorHeight / 100)
+                color: mediaControlsMouseArea.effectiveForegroundColor
+            }
+
         }
 
         ColumnLayout {
@@ -240,6 +255,7 @@ MouseArea {
             Layout.minimumWidth: 0
             Layout.leftMargin: mediaControlsMouseArea.hideNowPlayingArea ? mediaControlsMouseArea.hideModeHorizontalPadding : 0
             Layout.rightMargin: mediaControlsMouseArea.hideNowPlayingArea ? mediaControlsMouseArea.hideModeHorizontalPadding : 0
+            spacing: mediaControlsMouseArea.effectiveTrackTextVerticalSpacing
 
             ShadowedLabel {
                 Layout.fillWidth: true
@@ -255,7 +271,6 @@ MouseArea {
             }
 
             ShadowedLabel {
-                Layout.maximumWidth: 300
                 Layout.fillWidth: true
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
                 shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled

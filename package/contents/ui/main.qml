@@ -27,6 +27,16 @@ PlasmoidItem {
     property string configuredForegroundColor: plasmoid.configuration.foregroundColor
     // qmllint disable missing-property
     property bool configuredTextShadowEnabled: plasmoid.configuration.textShadowEnabled
+    // qmllint disable missing-property
+    property int configuredTrackTextVerticalSpacing: plasmoid.configuration.trackTextVerticalSpacing
+    // qmllint disable missing-property
+    property int configuredLabelVerticalSpacing: plasmoid.configuration.labelVerticalSpacing
+    // qmllint disable missing-property
+    property int configuredSeparatorGapLabel: plasmoid.configuration.separatorGapLabel
+    // qmllint disable missing-property
+    property int configuredSeparatorGapTrack: plasmoid.configuration.separatorGapTrack
+    // qmllint disable missing-property
+    property int configuredSeparatorHeight: plasmoid.configuration.separatorHeight
     readonly property int resolvedBackgroundHints: {
         if (configuredBackgroundStyle === "default")
             return PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground;
@@ -61,6 +71,11 @@ PlasmoidItem {
         configuredBackgroundRadius: root.configuredBackgroundRadius
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
+        configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
+        configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
+        configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
+        configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
+        configuredSeparatorHeight: root.configuredSeparatorHeight
     }
 
     compactRepresentation: Representation {
@@ -76,6 +91,11 @@ PlasmoidItem {
         configuredBackgroundRadius: root.configuredBackgroundRadius
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
+        configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
+        configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
+        configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
+        configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
+        configuredSeparatorHeight: root.configuredSeparatorHeight
     }
 
 }

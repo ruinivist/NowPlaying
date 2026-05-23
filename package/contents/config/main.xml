@@ -41,5 +41,25 @@
             <label>Enable text shadow</label>
             <default>false</default>
         </entry>
+        <entry name="trackTextVerticalSpacing" type="Int">
+            <label>Track text vertical spacing</label>
+            <default>5</default>
+        </entry>
+        <entry name="labelVerticalSpacing" type="Int">
+            <label>Now Playing label vertical spacing</label>
+            <default>0</default>
+        </entry>
+        <entry name="separatorGapLabel" type="Int">
+            <label>Separator gap from label rail</label>
+            <default>4</default>
+        </entry>
+        <entry name="separatorGapTrack" type="Int">
+            <label>Separator gap from track text</label>
+            <default>4</default>
+        </entry>
+        <entry name="separatorHeight" type="Int">
+            <label>Separator height percent</label>
+            <default>90</default>
+        </entry>
     </group>
 </kcfg>

@@ -92,6 +92,16 @@ Enable the repository pre-commit hook:
 make hooks-install
 ```
 
+## Customization
+
+The widget appearance can be tuned from the Plasma widget settings, including:
+
+- title/artist vertical spacing
+- NOW/PLAYING label vertical spacing
+- separator gap from labels
+- separator gap from track text
+- separator height percentage
+
 ## Release Upload
 
 Required GitHub repository secrets:

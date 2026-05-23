@@ -17,6 +17,11 @@ KCM.SimpleKCM {
     property alias cfg_backgroundRadius: backgroundRadiusSpinBox.value
     property alias cfg_foregroundColor: foregroundColorField.text
     property alias cfg_textShadowEnabled: textShadowCheckBox.checked
+    property alias cfg_trackTextVerticalSpacing: trackTextVerticalSpacingSpinBox.value
+    property alias cfg_labelVerticalSpacing: labelVerticalSpacingSpinBox.value
+    property alias cfg_separatorGapLabel: separatorGapLabelSpinBox.value
+    property alias cfg_separatorGapTrack: separatorGapTrackSpinBox.value
+    property alias cfg_separatorHeight: separatorHeightSpinBox.value
     readonly property var availableFonts: Qt.fontFamilies()
     readonly property var labelVisibilityOptions: [{
         "text": i18n("Auto hide when idle"),
@@ -185,6 +190,46 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Text shadow:")
             text: i18n("Enable")
+        }
+
+        QQC2.SpinBox {
+            id: trackTextVerticalSpacingSpinBox
+
+            Kirigami.FormData.label: i18n("Title/artist spacing:")
+            from: -12
+            to: 24
+        }
+
+        QQC2.SpinBox {
+            id: labelVerticalSpacingSpinBox
+
+            Kirigami.FormData.label: i18n("NOW/PLAYING spacing:")
+            from: -12
+            to: 24
+        }
+
+        QQC2.SpinBox {
+            id: separatorGapLabelSpinBox
+
+            Kirigami.FormData.label: i18n("Separator gap from labels:")
+            from: 0
+            to: 24
+        }
+
+        QQC2.SpinBox {
+            id: separatorGapTrackSpinBox
+
+            Kirigami.FormData.label: i18n("Separator gap from track:")
+            from: 0
+            to: 24
+        }
+
+        QQC2.SpinBox {
+            id: separatorHeightSpinBox
+
+            Kirigami.FormData.label: i18n("Separator height (%):")
+            from: 0
+            to: 100
         }
 
     }

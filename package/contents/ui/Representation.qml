@@ -44,6 +44,8 @@ MouseArea {
     readonly property int effectiveSeparatorHeight: Math.max(0, Math.min(100, configuredSeparatorHeight))
     readonly property var effectiveLabelLines: (configuredLabelText || "").split(/\r?\n/)
     readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
+    readonly property bool rawHoverActive: rootHoverHandler.hovered
+    readonly property bool controlsHoverActive: rawHoverActive || hoverExitTimer.running
     readonly property bool nowPlayingLabelsVisible: {
         if (effectiveLabelVisibilityMode === "always")
             return true;
@@ -55,7 +57,14 @@ MouseArea {
     }
 
     focus: true
+    acceptedButtons: Qt.NoButton
     hoverEnabled: true
+    onRawHoverActiveChanged: {
+        if (rawHoverActive)
+            hoverExitTimer.stop();
+        else
+            hoverExitTimer.restart();
+    }
     Keys.onPressed: (event) => {
         if (!event.modifiers) {
             event.accepted = true;
@@ -68,6 +77,18 @@ MouseArea {
             else
                 event.accepted = false;
         }
+    }
+
+    HoverHandler {
+        id: rootHoverHandler
+
+        margin: 12
+    }
+
+    Timer {
+        id: hoverExitTimer
+
+        interval: 300
     }
 
     Rectangle {
@@ -92,7 +113,7 @@ MouseArea {
             states: [
                 State {
                     name: "buttonsVisible"
-                    when: mediaControlsMouseArea.containsMouse
+                    when: mediaControlsMouseArea.controlsHoverActive
 
                     PropertyChanges {
                         target: nowPlayingLabels
@@ -102,7 +123,7 @@ MouseArea {
                 },
                 State {
                     name: "buttonsHidden"
-                    when: !mediaControlsMouseArea.containsMouse
+                    when: !mediaControlsMouseArea.controlsHoverActive
 
                     PropertyChanges {
                         target: nowPlayingLabels
@@ -151,8 +172,9 @@ MouseArea {
                 id: mediaControls
 
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                opacity: mediaControlsMouseArea.containsMouse && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
-                visible: opacity > 0 && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
+                enabled: mediaControlsMouseArea.controlsHoverActive
+                opacity: mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
+                visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize

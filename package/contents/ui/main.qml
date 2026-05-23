@@ -68,6 +68,8 @@ PlasmoidItem {
     }
 
     fullRepresentation: Representation {
+        width: root.width
+        height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
         Layout.minimumHeight: Kirigami.Units.gridUnit * 5
         Layout.preferredWidth: root.width
@@ -92,6 +94,8 @@ PlasmoidItem {
     }
 
     compactRepresentation: Representation {
+        width: root.width
+        height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
         Layout.minimumHeight: Kirigami.Units.gridUnit * 5
         Layout.preferredWidth: root.width

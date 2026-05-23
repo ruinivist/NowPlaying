@@ -14,7 +14,14 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredFontFamily: plasmoid.configuration.fontFamily
     // qmllint disable missing-property
+    property int configuredLabelFontSize: plasmoid.configuration.labelFontSize
+    // qmllint disable missing-property
+    property int configuredTitleFontSize: plasmoid.configuration.titleFontSize
+    // qmllint disable missing-property
+    property int configuredArtistFontSize: plasmoid.configuration.artistFontSize
+    // qmllint disable missing-property
     property string configuredLabelVisibilityMode: plasmoid.configuration.labelVisibilityMode
+    // qmllint disable missing-property
     // qmllint disable missing-property
     property string configuredLabelPlacement: plasmoid.configuration.labelPlacement
     // qmllint disable missing-property
@@ -66,6 +73,9 @@ PlasmoidItem {
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
+        configuredLabelFontSize: root.configuredLabelFontSize
+        configuredTitleFontSize: root.configuredTitleFontSize
+        configuredArtistFontSize: root.configuredArtistFontSize
         configuredLabelVisibilityMode: root.configuredLabelVisibilityMode
         configuredLabelPlacement: root.configuredLabelPlacement
         configuredLabelText: root.configuredLabelText
@@ -87,6 +97,9 @@ PlasmoidItem {
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
+        configuredLabelFontSize: root.configuredLabelFontSize
+        configuredTitleFontSize: root.configuredTitleFontSize
+        configuredArtistFontSize: root.configuredArtistFontSize
         configuredLabelVisibilityMode: root.configuredLabelVisibilityMode
         configuredLabelPlacement: root.configuredLabelPlacement
         configuredLabelText: root.configuredLabelText

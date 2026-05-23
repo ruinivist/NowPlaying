@@ -10,6 +10,9 @@ KCM.SimpleKCM {
 
     property alias cfg_opacity: opacitySpinBox.value
     property string cfg_fontFamily
+    property alias cfg_labelFontSize: labelFontSizeSpinBox.value
+    property alias cfg_titleFontSize: titleFontSizeSpinBox.value
+    property alias cfg_artistFontSize: artistFontSizeSpinBox.value
     property string cfg_labelVisibilityMode
     property string cfg_labelPlacement
     property alias cfg_labelText: labelTextArea.text
@@ -104,6 +107,30 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Font:")
             model: configRoot.availableFonts
             onActivated: configRoot.cfg_fontFamily = currentText
+        }
+
+        QQC2.SpinBox {
+            id: labelFontSizeSpinBox
+
+            Kirigami.FormData.label: i18n("Label font size:")
+            from: 8
+            to: 72
+        }
+
+        QQC2.SpinBox {
+            id: titleFontSizeSpinBox
+
+            Kirigami.FormData.label: i18n("Title font size:")
+            from: 8
+            to: 96
+        }
+
+        QQC2.SpinBox {
+            id: artistFontSizeSpinBox
+
+            Kirigami.FormData.label: i18n("Artist font size:")
+            from: 8
+            to: 96
         }
 
         QQC2.ComboBox {
@@ -206,23 +233,23 @@ KCM.SimpleKCM {
         QQC2.SpinBox {
             id: trackTextVerticalSpacingSpinBox
 
-            Kirigami.FormData.label: i18n("Title/artist spacing:")
-            from: -12
-            to: 24
+            Kirigami.FormData.label: i18n("Title/artist spacing (negatives possible):")
+            from: -200
+            to: 200
         }
 
         QQC2.SpinBox {
             id: labelVerticalSpacingSpinBox
 
-            Kirigami.FormData.label: i18n("NOW/PLAYING spacing:")
-            from: -12
-            to: 24
+            Kirigami.FormData.label: i18n("Label line spacing (negatives possible):")
+            from: -200
+            to: 200
         }
 
         QQC2.SpinBox {
             id: separatorGapLabelSpinBox
 
-            Kirigami.FormData.label: i18n("Separator gap from labels:")
+            Kirigami.FormData.label: i18n("Separator gap from label:")
             from: 0
             to: 24
         }

@@ -8,6 +8,9 @@ MouseArea {
     id: mediaControlsMouseArea
 
     property string configuredFontFamily: "Noto Sans"
+    property int configuredLabelFontSize: 16
+    property int configuredTitleFontSize: 28
+    property int configuredArtistFontSize: 26
     property string configuredLabelVisibilityMode: "auto"
     property string configuredLabelPlacement: "left"
     property string configuredLabelText: "NOW\nPLAYING"
@@ -31,6 +34,9 @@ MouseArea {
     readonly property string effectiveBackgroundColor: configuredBackgroundColor || "transparent"
     readonly property int effectiveBackgroundRadius: Math.max(0, configuredBackgroundRadius)
     readonly property string effectiveForegroundColor: configuredForegroundColor || "white"
+    readonly property int effectiveLabelFontSize: Math.max(1, configuredLabelFontSize)
+    readonly property int effectiveTitleFontSize: Math.max(1, configuredTitleFontSize)
+    readonly property int effectiveArtistFontSize: Math.max(1, configuredArtistFontSize)
     readonly property int effectiveTrackTextVerticalSpacing: configuredTrackTextVerticalSpacing
     readonly property int effectiveLabelVerticalSpacing: configuredLabelVerticalSpacing
     readonly property int effectiveSeparatorGapLabel: Math.max(0, configuredSeparatorGapLabel)
@@ -115,6 +121,7 @@ MouseArea {
                 id: nowPlayingLabels
 
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                Layout.fillWidth: true
                 spacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
                 visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
@@ -125,11 +132,12 @@ MouseArea {
                         required property string modelData
 
                         Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                        Layout.fillWidth: true
                         shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                         text: modelData
                         lineHeight: 0.8
                         font.bold: true
-                        font.pixelSize: 16
+                        font.pixelSize: mediaControlsMouseArea.effectiveLabelFontSize
                         font.family: mediaControlsMouseArea.configuredFontFamily
                         color: mediaControlsMouseArea.effectiveForegroundColor
                         horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
@@ -256,7 +264,7 @@ MouseArea {
                 Layout.fillWidth: true
                 shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                 text: player.title
-                font.pixelSize: 28
+                font.pixelSize: mediaControlsMouseArea.effectiveTitleFontSize
                 font.bold: true
                 font.family: mediaControlsMouseArea.configuredFontFamily
                 color: mediaControlsMouseArea.effectiveForegroundColor
@@ -270,7 +278,7 @@ MouseArea {
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
                 shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                 text: player.artists
-                font.pixelSize: 26
+                font.pixelSize: mediaControlsMouseArea.effectiveArtistFontSize
                 font.family: mediaControlsMouseArea.configuredFontFamily
                 color: mediaControlsMouseArea.effectiveForegroundColor
                 lineHeight: 0.8

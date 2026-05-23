@@ -13,6 +13,18 @@
             <label>Font family</label>
             <default>Noto Sans</default>
         </entry>
+        <entry name="labelFontSize" type="Int">
+            <label>Now Playing label font size</label>
+            <default>16</default>
+        </entry>
+        <entry name="titleFontSize" type="Int">
+            <label>Track title font size</label>
+            <default>28</default>
+        </entry>
+        <entry name="artistFontSize" type="Int">
+            <label>Track artist font size</label>
+            <default>26</default>
+        </entry>
         <entry name="labelVisibilityMode" type="String">
             <label>Now Playing label visibility mode</label>
             <default>auto</default>

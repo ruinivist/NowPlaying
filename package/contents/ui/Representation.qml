@@ -1,3 +1,4 @@
+import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
@@ -15,6 +16,7 @@ MouseArea {
     property string configuredLabelPlacement: "left"
     property string configuredLabelText: "NOW\nPLAYING"
     property bool configuredUseLabelArtwork: false
+    property int configuredImageBorderRadius: 8
     property string configuredBackgroundStyle: "custom"
     property string configuredBackgroundColor: "transparent"
     property int configuredBackgroundRadius: 0
@@ -33,6 +35,7 @@ MouseArea {
     readonly property bool usesCustomBackground: configuredBackgroundStyle === "custom"
     readonly property int hideModeHorizontalPadding: 8
     readonly property int labelRailWidth: 100
+    readonly property int effectiveImageBorderRadius: Math.max(0, configuredImageBorderRadius)
     readonly property string effectiveBackgroundColor: configuredBackgroundColor || "transparent"
     readonly property int effectiveBackgroundRadius: Math.max(0, configuredBackgroundRadius)
     readonly property string effectiveForegroundColor: configuredForegroundColor || "white"
@@ -179,10 +182,24 @@ MouseArea {
                         asynchronous: true
                         cache: true
                         fillMode: Image.PreserveAspectCrop
+                        visible: false
                         source: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
                         sourceSize.width: mediaControlsMouseArea.labelRailWidth
                         sourceSize.height: mediaControlsMouseArea.labelRailWidth
+                    }
+
+                    OpacityMask {
+                        anchors.fill: parent
+                        cached: true
+                        source: artworkImage
                         visible: labelContent.artworkReady
+
+                        maskSource: Rectangle {
+                            width: labelContent.width
+                            height: labelContent.height
+                            radius: mediaControlsMouseArea.effectiveImageBorderRadius
+                        }
+
                     }
 
                     Column {

@@ -42,6 +42,10 @@ PLAYING]]></default>
             <label>Show track image when available</label>
             <default>false</default>
         </entry>
+        <entry name="imageBorderRadius" type="Int">
+            <label>Image border radius</label>
+            <default>8</default>
+        </entry>
         <entry name="backgroundStyle" type="String">
             <label>Background style</label>
             <default>custom</default>

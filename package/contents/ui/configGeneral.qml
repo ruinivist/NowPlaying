@@ -17,6 +17,7 @@ KCM.SimpleKCM {
     property string cfg_labelPlacement
     property alias cfg_labelText: labelTextArea.text
     property alias cfg_useLabelArtwork: useLabelArtworkCheckBox.checked
+    property alias cfg_imageBorderRadius: imageBorderRadiusSpinBox.value
     property string cfg_backgroundStyle
     property alias cfg_backgroundColor: backgroundColorField.text
     property alias cfg_backgroundRadius: backgroundRadiusSpinBox.value
@@ -226,6 +227,14 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Label image:")
             text: i18n("Show track image when available")
+        }
+
+        QQC2.SpinBox {
+            id: imageBorderRadiusSpinBox
+
+            Kirigami.FormData.label: i18n("Image border radius:")
+            from: 0
+            to: 100
         }
 
         QQC2.TextArea {

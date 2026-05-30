@@ -1,5 +1,5 @@
-import Qt5Compat.GraphicalEffects
 import QtQuick
+import QtQuick.Effects
 
 Item {
     id: labelContent
@@ -115,7 +115,7 @@ Item {
         asynchronous: true
         cache: true
         fillMode: Image.PreserveAspectCrop
-        visible: false
+        opacity: 0
         source: labelContent.currentArtworkSource
         sourceSize.width: labelContent.artworkSize
         sourceSize.height: labelContent.artworkSize
@@ -128,7 +128,7 @@ Item {
         asynchronous: true
         cache: true
         fillMode: Image.PreserveAspectCrop
-        visible: false
+        opacity: 0
         source: labelContent.incomingArtworkSource
         sourceSize.width: labelContent.artworkSize
         sourceSize.height: labelContent.artworkSize
@@ -144,38 +144,39 @@ Item {
         }
     }
 
-    OpacityMask {
+    Rectangle {
+        id: artworkMaskShape
+
+        anchors.fill: parent
+        antialiasing: true
+        color: "white"
+        layer.enabled: true
+        radius: labelContent.borderRadius
+        visible: false
+    }
+
+    MultiEffect {
         id: currentArtworkMask
 
         anchors.fill: parent
-        cached: true
+        autoPaddingEnabled: false
+        maskEnabled: true
+        maskSource: artworkMaskShape
         source: currentArtworkImage
         opacity: labelContent.currentArtworkOpacity
         visible: labelContent.currentArtworkSource.length > 0 && opacity > 0
-
-        maskSource: Rectangle {
-            width: labelContent.width
-            height: labelContent.height
-            radius: labelContent.borderRadius
-        }
-
     }
 
-    OpacityMask {
+    MultiEffect {
         id: incomingArtworkMask
 
         anchors.fill: parent
-        cached: true
+        autoPaddingEnabled: false
+        maskEnabled: true
+        maskSource: artworkMaskShape
         source: incomingArtworkImage
         opacity: labelContent.incomingArtworkOpacity
         visible: labelContent.incomingArtworkSource.length > 0 && opacity > 0
-
-        maskSource: Rectangle {
-            width: labelContent.width
-            height: labelContent.height
-            radius: labelContent.borderRadius
-        }
-
     }
 
     Column {

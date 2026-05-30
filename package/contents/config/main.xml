@@ -90,5 +90,9 @@ PLAYING]]></default>
             <label>Separator height percent</label>
             <default>90</default>
         </entry>
+        <entry name="hideSeparator" type="Bool">
+            <label>Hide separator</label>
+            <default>false</default>
+        </entry>
     </group>
 </kcfg>

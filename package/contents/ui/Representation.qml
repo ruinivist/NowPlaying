@@ -28,6 +28,7 @@ MouseArea {
     property int configuredSeparatorGapLabel: 4
     property int configuredSeparatorGapTrack: 4
     property int configuredSeparatorHeight: 90
+    property bool configuredHideSeparator: false
     readonly property double buttonSize: 16
     readonly property string effectiveLabelVisibilityMode: configuredLabelVisibilityMode === "always" || configuredLabelVisibilityMode === "never" ? configuredLabelVisibilityMode : "auto"
     readonly property bool labelsOnRight: configuredLabelPlacement === "right"
@@ -322,7 +323,7 @@ MouseArea {
         Item {
             id: separatorContainer
 
-            visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
+            visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea && !mediaControlsMouseArea.configuredHideSeparator
             Layout.fillHeight: true
             Layout.leftMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapLabel : 0
             Layout.rightMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapTrack : 0

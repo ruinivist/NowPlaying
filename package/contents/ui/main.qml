@@ -52,6 +52,8 @@ PlasmoidItem {
     property int configuredSeparatorGapTrack: plasmoid.configuration.separatorGapTrack
     // qmllint disable missing-property
     property int configuredSeparatorHeight: plasmoid.configuration.separatorHeight
+    // qmllint disable missing-property
+    property bool configuredHideSeparator: plasmoid.configuration.hideSeparator
     readonly property int resolvedBackgroundHints: {
         if (configuredBackgroundStyle === "default")
             return PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground;
@@ -100,6 +102,7 @@ PlasmoidItem {
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
+        configuredHideSeparator: root.configuredHideSeparator
     }
 
     compactRepresentation: Representation {
@@ -129,6 +132,7 @@ PlasmoidItem {
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
+        configuredHideSeparator: root.configuredHideSeparator
     }
 
 }

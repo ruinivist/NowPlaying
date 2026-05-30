@@ -29,6 +29,7 @@ KCM.SimpleKCM {
     property alias cfg_separatorGapLabel: separatorGapLabelSpinBox.value
     property alias cfg_separatorGapTrack: separatorGapTrackSpinBox.value
     property alias cfg_separatorHeight: separatorHeightSpinBox.value
+    property alias cfg_hideSeparator: hideSeparatorCheckBox.checked
     readonly property var availableFonts: Qt.fontFamilies()
     readonly property var labelVisibilityOptions: [{
         "text": i18n("Auto hide when idle"),
@@ -196,6 +197,13 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Separator height (%):")
             from: 0
             to: 100
+        }
+
+        QQC2.CheckBox {
+            id: hideSeparatorCheckBox
+
+            Kirigami.FormData.label: i18n("Separator:")
+            text: i18n("Hide separator")
         }
 
         SectionHeader {

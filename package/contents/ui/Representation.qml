@@ -1,9 +1,7 @@
-import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents
 
 MouseArea {
     id: mediaControlsMouseArea
@@ -166,72 +164,19 @@ MouseArea {
                 Layout.fillWidth: true
                 visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
-                Item {
-                    id: labelContent
-
-                    readonly property bool artworkReady: mediaControlsMouseArea.configuredUseLabelArtwork && artworkImage.status === Image.Ready && artworkImage.source.toString().length > 0
-
+                LabelContent {
                     Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
                     Layout.fillWidth: true
-                    clip: artworkReady
-                    implicitHeight: artworkReady ? mediaControlsMouseArea.labelRailWidth : labelTextColumn.implicitHeight
-
-                    Image {
-                        id: artworkImage
-
-                        anchors.fill: parent
-                        asynchronous: true
-                        cache: true
-                        fillMode: Image.PreserveAspectCrop
-                        visible: false
-                        source: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
-                        sourceSize.width: mediaControlsMouseArea.labelRailWidth
-                        sourceSize.height: mediaControlsMouseArea.labelRailWidth
-                    }
-
-                    OpacityMask {
-                        anchors.fill: parent
-                        cached: true
-                        source: artworkImage
-                        visible: labelContent.artworkReady
-
-                        maskSource: Rectangle {
-                            width: labelContent.width
-                            height: labelContent.height
-                            radius: mediaControlsMouseArea.effectiveImageBorderRadius
-                        }
-
-                    }
-
-                    Column {
-                        id: labelTextColumn
-
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
-                        visible: !labelContent.artworkReady
-
-                        Repeater {
-                            model: mediaControlsMouseArea.effectiveLabelLines
-
-                            delegate: ShadowedLabel {
-                                required property string modelData
-
-                                width: labelTextColumn.width
-                                shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
-                                text: modelData
-                                lineHeight: 0.8
-                                font.bold: true
-                                font.pixelSize: mediaControlsMouseArea.effectiveLabelFontSize
-                                font.family: mediaControlsMouseArea.configuredFontFamily
-                                color: mediaControlsMouseArea.effectiveForegroundColor
-                                horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
-                            }
-
-                        }
-
-                    }
-
+                    artworkSource: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
+                    labelLines: mediaControlsMouseArea.effectiveLabelLines
+                    fontFamily: mediaControlsMouseArea.configuredFontFamily
+                    fontPixelSize: mediaControlsMouseArea.effectiveLabelFontSize
+                    textColor: mediaControlsMouseArea.effectiveForegroundColor
+                    textShadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
+                    verticalSpacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
+                    horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
+                    borderRadius: mediaControlsMouseArea.effectiveImageBorderRadius
+                    artworkSize: mediaControlsMouseArea.labelRailWidth
                 }
 
             }
@@ -376,46 +321,6 @@ MouseArea {
                 horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
 
-        }
-
-    }
-
-    component ShadowedLabel: Item {
-        id: shadowedLabel
-
-        property alias text: foregroundLabel.text
-        property alias font: foregroundLabel.font
-        property alias lineHeight: foregroundLabel.lineHeight
-        property alias elide: foregroundLabel.elide
-        property alias horizontalAlignment: foregroundLabel.horizontalAlignment
-        property alias verticalAlignment: foregroundLabel.verticalAlignment
-        property alias color: foregroundLabel.color
-        property bool shadowEnabled: false
-
-        implicitWidth: foregroundLabel.implicitWidth + (shadowEnabled ? 1 : 0)
-        implicitHeight: foregroundLabel.implicitHeight + (shadowEnabled ? 1 : 0)
-
-        PlasmaComponents.Label {
-            id: shadowLabel
-
-            visible: shadowedLabel.shadowEnabled
-            x: 1
-            y: 1
-            width: foregroundLabel.width
-            height: foregroundLabel.height
-            text: foregroundLabel.text
-            font: foregroundLabel.font
-            lineHeight: foregroundLabel.lineHeight
-            elide: foregroundLabel.elide
-            horizontalAlignment: foregroundLabel.horizontalAlignment
-            verticalAlignment: foregroundLabel.verticalAlignment
-            color: "#99000000"
-        }
-
-        PlasmaComponents.Label {
-            id: foregroundLabel
-
-            anchors.fill: parent
         }
 
     }

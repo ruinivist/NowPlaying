@@ -323,7 +323,7 @@ MouseArea {
         Item {
             id: separatorContainer
 
-            visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea && !mediaControlsMouseArea.configuredHideSeparator
+            visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
             Layout.fillHeight: true
             Layout.leftMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapLabel : 0
             Layout.rightMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapTrack : 0
@@ -336,7 +336,7 @@ MouseArea {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 1
                 height: Math.round(parent.height * mediaControlsMouseArea.effectiveSeparatorHeight / 100)
-                color: mediaControlsMouseArea.effectiveForegroundColor
+                color: mediaControlsMouseArea.configuredHideSeparator ? "transparent" : mediaControlsMouseArea.effectiveForegroundColor
             }
 
         }

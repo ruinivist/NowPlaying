@@ -22,6 +22,7 @@ KCM.SimpleKCM {
     property alias cfg_backgroundRadius: backgroundRadiusSpinBox.value
     property alias cfg_foregroundColor: foregroundColorField.text
     property alias cfg_textShadowEnabled: textShadowCheckBox.checked
+    property alias cfg_showMediaControls: showMediaControlsCheckBox.checked
     property alias cfg_trackTextVerticalSpacing: trackTextVerticalSpacingSpinBox.value
     property alias cfg_labelVerticalSpacing: labelVerticalSpacingSpinBox.value
     property alias cfg_separatorGapLabel: separatorGapLabelSpinBox.value
@@ -179,6 +180,13 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Text shadow:")
             text: i18n("Enable")
+        }
+
+        QQC2.CheckBox {
+            id: showMediaControlsCheckBox
+
+            Kirigami.FormData.label: i18n("Media controls:")
+            text: i18n("Show media controls")
         }
 
         QQC2.SpinBox {

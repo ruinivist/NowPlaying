@@ -20,6 +20,7 @@ MouseArea {
     property int configuredBackgroundRadius: 0
     property string configuredForegroundColor: "white"
     property bool configuredTextShadowEnabled: false
+    property bool configuredShowMediaControls: true
     property int configuredTrackTextVerticalSpacing: 5
     property int configuredLabelVerticalSpacing: 0
     property int configuredSeparatorGapLabel: 4
@@ -44,9 +45,10 @@ MouseArea {
     readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
     readonly property int effectiveSeparatorHeight: Math.max(0, Math.min(100, configuredSeparatorHeight))
     readonly property var effectiveLabelLines: (configuredLabelText || "").split(/\r?\n/)
+    readonly property bool mediaControlsEnabled: configuredShowMediaControls
     readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
-    readonly property bool rawHoverActive: rootHoverHandler.hovered
-    readonly property bool controlsHoverActive: rawHoverActive || hoverExitTimer.running
+    readonly property bool rawHoverActive: mediaControlsEnabled && rootHoverHandler.hovered
+    readonly property bool controlsHoverActive: mediaControlsEnabled && (rawHoverActive || hoverExitTimer.running)
     readonly property bool nowPlayingLabelsVisible: {
         if (effectiveLabelVisibilityMode === "always")
             return true;
@@ -61,12 +63,25 @@ MouseArea {
     acceptedButtons: Qt.NoButton
     hoverEnabled: true
     onRawHoverActiveChanged: {
+        if (!mediaControlsMouseArea.mediaControlsEnabled) {
+            hoverExitTimer.stop();
+            return ;
+        }
         if (rawHoverActive)
             hoverExitTimer.stop();
         else
             hoverExitTimer.restart();
     }
+    onMediaControlsEnabledChanged: {
+        if (!mediaControlsMouseArea.mediaControlsEnabled)
+            hoverExitTimer.stop();
+
+    }
     Keys.onPressed: (event) => {
+        if (!mediaControlsMouseArea.mediaControlsEnabled) {
+            event.accepted = false;
+            return ;
+        }
         if (!event.modifiers) {
             event.accepted = true;
             if (event.key === Qt.Key_Space || event.key === Qt.Key_K)
@@ -83,6 +98,7 @@ MouseArea {
     HoverHandler {
         id: rootHoverHandler
 
+        enabled: mediaControlsMouseArea.mediaControlsEnabled
         margin: 60
     }
 
@@ -206,9 +222,9 @@ MouseArea {
                 id: mediaControls
 
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                enabled: mediaControlsMouseArea.controlsHoverActive
-                opacity: mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
-                visible: mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
+                enabled: mediaControlsMouseArea.mediaControlsEnabled && mediaControlsMouseArea.controlsHoverActive
+                opacity: mediaControlsMouseArea.mediaControlsEnabled && mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
+                visible: mediaControlsMouseArea.mediaControlsEnabled && mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize

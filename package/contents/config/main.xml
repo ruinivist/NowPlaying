@@ -62,6 +62,10 @@ PLAYING]]></default>
             <label>Enable text shadow</label>
             <default>false</default>
         </entry>
+        <entry name="showMediaControls" type="Bool">
+            <label>Show media controls</label>
+            <default>true</default>
+        </entry>
         <entry name="trackTextVerticalSpacing" type="Int">
             <label>Track text vertical spacing</label>
             <default>5</default>

@@ -39,6 +39,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property bool configuredTextShadowEnabled: plasmoid.configuration.textShadowEnabled
     // qmllint disable missing-property
+    property bool configuredShowMediaControls: plasmoid.configuration.showMediaControls
+    // qmllint disable missing-property
     property int configuredTrackTextVerticalSpacing: plasmoid.configuration.trackTextVerticalSpacing
     // qmllint disable missing-property
     property int configuredLabelVerticalSpacing: plasmoid.configuration.labelVerticalSpacing
@@ -89,6 +91,7 @@ PlasmoidItem {
         configuredBackgroundRadius: root.configuredBackgroundRadius
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
+        configuredShowMediaControls: root.configuredShowMediaControls
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
@@ -116,6 +119,7 @@ PlasmoidItem {
         configuredBackgroundRadius: root.configuredBackgroundRadius
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
+        configuredShowMediaControls: root.configuredShowMediaControls
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel

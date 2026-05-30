@@ -16,6 +16,7 @@ KCM.SimpleKCM {
     property string cfg_labelVisibilityMode
     property string cfg_labelPlacement
     property alias cfg_labelText: labelTextArea.text
+    property alias cfg_useLabelArtwork: useLabelArtworkCheckBox.checked
     property string cfg_backgroundStyle
     property alias cfg_backgroundColor: backgroundColorField.text
     property alias cfg_backgroundRadius: backgroundRadiusSpinBox.value
@@ -65,33 +66,6 @@ KCM.SimpleKCM {
             comboBox.currentIndex = resolvedIndex;
 
         return options[resolvedIndex].value;
-    }
-
-    component SectionHeader: Item {
-        required property string title
-        Kirigami.FormData.isSection: true
-        implicitHeight: sectionLayout.implicitHeight
-
-        ColumnLayout {
-            id: sectionLayout
-            anchors.left: parent.left
-            anchors.right: parent.right
-            spacing: Kirigami.Units.smallSpacing
-
-            QQC2.Label {
-                text: parent.parent.title
-                font.bold: true
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 1
-                color: Kirigami.Theme.textColor
-                opacity: 0.25
-            }
-
-        }
-
     }
 
     onCfg_fontFamilyChanged: {
@@ -239,6 +213,13 @@ KCM.SimpleKCM {
             onActivated: configRoot.cfg_labelPlacement = currentValue
         }
 
+        QQC2.CheckBox {
+            id: useLabelArtworkCheckBox
+
+            Kirigami.FormData.label: i18n("Label image:")
+            text: i18n("Show track image when available")
+        }
+
         QQC2.TextArea {
             id: labelTextArea
 
@@ -325,6 +306,35 @@ KCM.SimpleKCM {
         title: i18n("Select foreground color")
         options: Dialogs.ColorDialog.ShowAlphaChannel
         onAccepted: configRoot.cfg_foregroundColor = selectedColor.toString()
+    }
+
+    component SectionHeader: Item {
+        required property string title
+
+        Kirigami.FormData.isSection: true
+        implicitHeight: sectionLayout.implicitHeight
+
+        ColumnLayout {
+            id: sectionLayout
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: Kirigami.Units.smallSpacing
+
+            QQC2.Label {
+                text: parent.parent.title
+                font.bold: true
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 1
+                color: Kirigami.Theme.textColor
+                opacity: 0.25
+            }
+
+        }
+
     }
 
 }

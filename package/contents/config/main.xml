@@ -38,6 +38,10 @@
             <default><![CDATA[NOW
 PLAYING]]></default>
         </entry>
+        <entry name="useLabelArtwork" type="Bool">
+            <label>Show track image when available</label>
+            <default>false</default>
+        </entry>
         <entry name="backgroundStyle" type="String">
             <label>Background style</label>
             <default>custom</default>

@@ -14,6 +14,7 @@ MouseArea {
     property string configuredLabelVisibilityMode: "auto"
     property string configuredLabelPlacement: "left"
     property string configuredLabelText: "NOW\nPLAYING"
+    property bool configuredUseLabelArtwork: false
     property string configuredBackgroundStyle: "custom"
     property string configuredBackgroundColor: "transparent"
     property int configuredBackgroundRadius: 0
@@ -82,7 +83,7 @@ MouseArea {
     HoverHandler {
         id: rootHoverHandler
 
-        margin: 12
+        margin: 60
     }
 
     Timer {
@@ -143,25 +144,58 @@ MouseArea {
 
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
                 Layout.fillWidth: true
-                spacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
                 visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
-                Repeater {
-                    model: mediaControlsMouseArea.effectiveLabelLines
+                Item {
+                    id: labelContent
 
-                    delegate: ShadowedLabel {
-                        required property string modelData
+                    readonly property bool artworkReady: mediaControlsMouseArea.configuredUseLabelArtwork && artworkImage.status === Image.Ready && artworkImage.source.toString().length > 0
 
-                        Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                        Layout.fillWidth: true
-                        shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
-                        text: modelData
-                        lineHeight: 0.8
-                        font.bold: true
-                        font.pixelSize: mediaControlsMouseArea.effectiveLabelFontSize
-                        font.family: mediaControlsMouseArea.configuredFontFamily
-                        color: mediaControlsMouseArea.effectiveForegroundColor
-                        horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
+                    Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
+                    Layout.fillWidth: true
+                    clip: artworkReady
+                    implicitHeight: artworkReady ? mediaControlsMouseArea.labelRailWidth : labelTextColumn.implicitHeight
+
+                    Image {
+                        id: artworkImage
+
+                        anchors.fill: parent
+                        asynchronous: true
+                        cache: true
+                        fillMode: Image.PreserveAspectCrop
+                        source: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
+                        sourceSize.width: mediaControlsMouseArea.labelRailWidth
+                        sourceSize.height: mediaControlsMouseArea.labelRailWidth
+                        visible: labelContent.artworkReady
+                    }
+
+                    Column {
+                        id: labelTextColumn
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        spacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
+                        visible: !labelContent.artworkReady
+
+                        Repeater {
+                            model: mediaControlsMouseArea.effectiveLabelLines
+
+                            delegate: ShadowedLabel {
+                                required property string modelData
+
+                                width: labelTextColumn.width
+                                shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
+                                text: modelData
+                                lineHeight: 0.8
+                                font.bold: true
+                                font.pixelSize: mediaControlsMouseArea.effectiveLabelFontSize
+                                font.family: mediaControlsMouseArea.configuredFontFamily
+                                color: mediaControlsMouseArea.effectiveForegroundColor
+                                horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
+                            }
+
+                        }
+
                     }
 
                 }

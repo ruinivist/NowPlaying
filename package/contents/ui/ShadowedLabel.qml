@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import org.kde.plasma.components as PlasmaComponents
 
 Item {
@@ -12,31 +13,49 @@ Item {
     property alias verticalAlignment: foregroundLabel.verticalAlignment
     property alias color: foregroundLabel.color
     property bool shadowEnabled: false
+    readonly property real contentWidth: width > 0 ? width : foregroundLabel.implicitWidth
+    readonly property real contentHeight: height > 0 ? height : foregroundLabel.implicitHeight
 
-    implicitWidth: foregroundLabel.implicitWidth + (shadowEnabled ? 1 : 0)
-    implicitHeight: foregroundLabel.implicitHeight + (shadowEnabled ? 1 : 0)
+    implicitWidth: foregroundLabel.implicitWidth
+    implicitHeight: foregroundLabel.implicitHeight
 
     PlasmaComponents.Label {
-        id: shadowLabel
+        id: shadowSourceLabel
 
-        visible: shadowedLabel.shadowEnabled
-        x: 1
-        y: 1
-        width: foregroundLabel.width
-        height: foregroundLabel.height
+        visible: false
+        width: shadowedLabel.contentWidth
+        height: shadowedLabel.contentHeight
         text: foregroundLabel.text
         font: foregroundLabel.font
         lineHeight: foregroundLabel.lineHeight
         elide: foregroundLabel.elide
         horizontalAlignment: foregroundLabel.horizontalAlignment
         verticalAlignment: foregroundLabel.verticalAlignment
-        color: "#99000000"
+        color: "white"
+    }
+
+    MultiEffect {
+        x: shadowSourceLabel.x
+        y: shadowSourceLabel.y
+        width: shadowSourceLabel.width
+        height: shadowSourceLabel.height
+        autoPaddingEnabled: true
+        shadowBlur: 0.5
+        shadowColor: "#3f4c66"
+        shadowEnabled: shadowedLabel.shadowEnabled
+        shadowHorizontalOffset: 0
+        shadowOpacity: 0.42
+        shadowScale: 1
+        shadowVerticalOffset: 2
+        source: shadowSourceLabel
+        visible: shadowedLabel.shadowEnabled
     }
 
     PlasmaComponents.Label {
         id: foregroundLabel
 
-        anchors.fill: parent
+        width: shadowedLabel.contentWidth
+        height: shadowedLabel.contentHeight
     }
 
 }

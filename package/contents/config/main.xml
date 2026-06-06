@@ -70,6 +70,10 @@ PLAYING]]></default>
             <label>Show media controls</label>
             <default>true</default>
         </entry>
+        <entry name="sourcePriority" type="String">
+            <label>Source priority</label>
+            <default></default>
+        </entry>
         <entry name="trackTextVerticalSpacing" type="Int">
             <label>Track text vertical spacing</label>
             <default>5</default>

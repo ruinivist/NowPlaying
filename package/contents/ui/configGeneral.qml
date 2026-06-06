@@ -4,6 +4,7 @@ import QtQuick.Dialogs as Dialogs
 import QtQuick.Layouts
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
+import org.kde.plasma.private.mpris as Mpris
 
 KCM.SimpleKCM {
     id: configRoot
@@ -24,13 +25,16 @@ KCM.SimpleKCM {
     property alias cfg_foregroundColor: foregroundColorField.text
     property alias cfg_textShadowEnabled: textShadowCheckBox.checked
     property alias cfg_showMediaControls: showMediaControlsCheckBox.checked
+    property alias cfg_sourcePriority: sourcePriorityField.text
     property alias cfg_trackTextVerticalSpacing: trackTextVerticalSpacingSpinBox.value
     property alias cfg_labelVerticalSpacing: labelVerticalSpacingSpinBox.value
     property alias cfg_separatorGapLabel: separatorGapLabelSpinBox.value
     property alias cfg_separatorGapTrack: separatorGapTrackSpinBox.value
     property alias cfg_separatorHeight: separatorHeightSpinBox.value
     property alias cfg_hideSeparator: hideSeparatorCheckBox.checked
+    readonly property int containerRole: Qt.UserRole + 1
     readonly property var availableFonts: Qt.fontFamilies()
+    property var detectedSources: []
     readonly property var labelVisibilityOptions: [{
         "text": i18n("Auto hide when idle"),
         "value": "auto"
@@ -69,6 +73,28 @@ KCM.SimpleKCM {
             comboBox.currentIndex = resolvedIndex;
 
         return options[resolvedIndex].value;
+    }
+
+    function normalizeDesktopEntry(value) {
+        return (value || "").toString().trim();
+    }
+
+    function refreshDetectedSources() {
+        const sources = [];
+        const seen = {
+        };
+        const playerCount = detectedSourcesModel.rowCount();
+        for (let row = 0; row < playerCount; ++row) {
+            const player = detectedSourcesModel.data(detectedSourcesModel.index(row, 0), containerRole);
+            const desktopEntry = normalizeDesktopEntry(player ? player.desktopEntry : "");
+            const desktopEntryKey = desktopEntry.toLowerCase();
+            if (!desktopEntry || seen[desktopEntryKey])
+                continue;
+
+            seen[desktopEntryKey] = true;
+            sources.push(desktopEntry);
+        }
+        detectedSources = sources;
     }
 
     onCfg_fontFamilyChanged: {
@@ -189,6 +215,25 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Media controls:")
             text: i18n("Show media controls")
+        }
+
+        QQC2.TextField {
+            id: sourcePriorityField
+
+            Kirigami.FormData.label: i18n("Source priority:")
+            Layout.fillWidth: true
+            placeholderText: i18n("spotify, firefox")
+        }
+
+        QQC2.Label {
+            id: detectedSourcesField
+
+            Kirigami.FormData.label: i18n("Current sources being detected:")
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2)
+            textFormat: TextEdit.PlainText
+            wrapMode: TextEdit.WrapAnywhere
+            text: configRoot.detectedSources.length > 0 ? configRoot.detectedSources.join("\n") : i18n("No active MPRIS desktopEntry values detected")
         }
 
         QQC2.SpinBox {
@@ -331,6 +376,16 @@ KCM.SimpleKCM {
         title: i18n("Select foreground color")
         options: Dialogs.ColorDialog.ShowAlphaChannel
         onAccepted: configRoot.cfg_foregroundColor = selectedColor.toString()
+    }
+
+    Mpris.Mpris2Model {
+        id: detectedSourcesModel
+
+        onRowsInserted: configRoot.refreshDetectedSources()
+        onRowsRemoved: configRoot.refreshDetectedSources()
+        onModelReset: configRoot.refreshDetectedSources()
+        onDataChanged: configRoot.refreshDetectedSources()
+        Component.onCompleted: configRoot.refreshDetectedSources()
     }
 
     component SectionHeader: Item {

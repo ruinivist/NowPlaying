@@ -104,7 +104,8 @@ Item {
     }
 
     clip: holdsArtworkSlot
-    implicitHeight: holdsArtworkSlot ? artworkSize : labelTextColumn.implicitHeight
+    implicitWidth: artworkSize
+    implicitHeight: artworkSize
     onArtworkSourceChanged: handleArtworkSourceChange()
     Component.onCompleted: handleArtworkSourceChange()
 
@@ -184,6 +185,7 @@ Item {
 
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
         spacing: labelContent.verticalSpacing
         opacity: labelContent.textOpacity
         visible: opacity > 0

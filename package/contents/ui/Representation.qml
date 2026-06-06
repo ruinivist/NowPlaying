@@ -33,7 +33,11 @@ MouseArea {
     readonly property bool hideNowPlayingArea: effectiveLabelVisibilityMode === "never"
     readonly property bool usesCustomBackground: configuredBackgroundStyle === "custom"
     readonly property int hideModeHorizontalPadding: 8
-    readonly property int labelRailWidth: 100
+    readonly property int contentInset: 8
+    readonly property int labelRailSize: Math.max(0, height - contentInset * 2)
+    readonly property bool mediaControlsShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
+    readonly property int labelControlGap: 8
+    readonly property int labelContentSize: Math.max(0, labelRailSize - (mediaControlsShown ? buttonSize + labelControlGap : 0))
     readonly property int effectiveImageBorderRadius: Math.max(0, configuredImageBorderRadius)
     readonly property string effectiveBackgroundColor: configuredBackgroundColor || "transparent"
     readonly property int effectiveBackgroundRadius: Math.max(0, configuredBackgroundRadius)
@@ -119,6 +123,7 @@ MouseArea {
 
     RowLayout {
         anchors.fill: parent
+        anchors.margins: mediaControlsMouseArea.contentInset
         layoutDirection: mediaControlsMouseArea.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
         ColumnLayout {
@@ -126,36 +131,10 @@ MouseArea {
 
             visible: !mediaControlsMouseArea.hideNowPlayingArea
             Layout.fillHeight: true
-            Layout.minimumWidth: visible ? mediaControlsMouseArea.labelRailWidth : 0
-            Layout.preferredWidth: visible ? mediaControlsMouseArea.labelRailWidth : 0
-            Layout.maximumWidth: visible ? mediaControlsMouseArea.labelRailWidth : 0
-            states: [
-                State {
-                    name: "buttonsVisible"
-                    when: mediaControlsMouseArea.controlsHoverActive
-
-                    PropertyChanges {
-                        target: nowPlayingLabels
-                        Layout.bottomMargin: 10
-                    }
-
-                },
-                State {
-                    name: "buttonsHidden"
-                    when: !mediaControlsMouseArea.controlsHoverActive
-
-                    PropertyChanges {
-                        target: nowPlayingLabels
-                        Layout.bottomMargin: 0
-                    }
-
-                }
-            ]
-
-            Item {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-            }
+            Layout.minimumWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
+            Layout.preferredWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
+            Layout.maximumWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
+            spacing: 0
 
             ColumnLayout {
                 id: nowPlayingLabels
@@ -166,7 +145,10 @@ MouseArea {
 
                 LabelContent {
                     Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: mediaControlsMouseArea.labelContentSize
+                    Layout.preferredHeight: mediaControlsMouseArea.labelContentSize
+                    Layout.maximumWidth: mediaControlsMouseArea.labelRailSize
+                    Layout.maximumHeight: mediaControlsMouseArea.labelRailSize
                     artworkSource: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
                     labelLines: mediaControlsMouseArea.effectiveLabelLines
                     fontFamily: mediaControlsMouseArea.configuredFontFamily
@@ -176,7 +158,7 @@ MouseArea {
                     verticalSpacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
                     horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
                     borderRadius: mediaControlsMouseArea.effectiveImageBorderRadius
-                    artworkSize: mediaControlsMouseArea.labelRailWidth
+                    artworkSize: mediaControlsMouseArea.labelContentSize
                 }
 
             }
@@ -185,9 +167,10 @@ MouseArea {
                 id: mediaControls
 
                 Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                enabled: mediaControlsMouseArea.mediaControlsEnabled && mediaControlsMouseArea.controlsHoverActive
-                opacity: mediaControlsMouseArea.mediaControlsEnabled && mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea ? 1 : 0
-                visible: mediaControlsMouseArea.mediaControlsEnabled && mediaControlsMouseArea.controlsHoverActive && mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
+                Layout.topMargin: visible ? mediaControlsMouseArea.labelControlGap : 0
+                enabled: mediaControlsMouseArea.mediaControlsShown
+                opacity: mediaControlsMouseArea.mediaControlsShown ? 1 : 0
+                visible: mediaControlsMouseArea.mediaControlsShown
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize
@@ -245,20 +228,6 @@ MouseArea {
                         easing.type: Easing.InOutQuad
                     }
 
-                }
-
-            }
-
-            Item {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-            }
-
-            transitions: Transition {
-                NumberAnimation {
-                    duration: 250
-                    easing.type: Easing.InOutQuad
-                    properties: "Layout.bottomMargin"
                 }
 
             }

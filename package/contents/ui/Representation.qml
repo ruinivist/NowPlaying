@@ -35,9 +35,17 @@ MouseArea {
     readonly property int hideModeHorizontalPadding: 8
     readonly property int contentInset: 8
     readonly property int labelRailSize: Math.max(0, height - contentInset * 2)
-    readonly property bool mediaControlsShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
-    readonly property int labelControlGap: 8
-    readonly property int labelContentSize: Math.max(0, labelRailSize - (mediaControlsShown ? buttonSize + labelControlGap : 0))
+    readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
+    readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize) / labelRailSize) : 1
+    property real labelContentScale: mediaControlsTargetShown ? labelShrunkScale : 1
+    readonly property real controlsReveal: {
+        const range = 1 - labelShrunkScale;
+        if (range <= 0)
+            return mediaControlsTargetShown ? 1 : 0;
+
+        return Math.max(0, Math.min(1, (1 - labelContentScale) / range));
+    }
+    readonly property real labelContentSize: labelRailSize * labelContentScale
     readonly property int effectiveImageBorderRadius: Math.max(0, configuredImageBorderRadius)
     readonly property string effectiveBackgroundColor: configuredBackgroundColor || "transparent"
     readonly property int effectiveBackgroundRadius: Math.max(0, configuredBackgroundRadius)
@@ -71,7 +79,7 @@ MouseArea {
     onRawHoverActiveChanged: {
         if (!mediaControlsMouseArea.mediaControlsEnabled) {
             hoverExitTimer.stop();
-            return ;
+            return;
         }
         if (rawHoverActive)
             hoverExitTimer.stop();
@@ -81,12 +89,11 @@ MouseArea {
     onMediaControlsEnabledChanged: {
         if (!mediaControlsMouseArea.mediaControlsEnabled)
             hoverExitTimer.stop();
-
     }
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (!mediaControlsMouseArea.mediaControlsEnabled) {
             event.accepted = false;
-            return ;
+            return;
         }
         if (!event.modifiers) {
             event.accepted = true;
@@ -114,6 +121,13 @@ MouseArea {
         interval: 300
     }
 
+    Behavior on labelContentScale {
+        NumberAnimation {
+            duration: 250
+            easing.type: Easing.InOutQuad
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         visible: mediaControlsMouseArea.usesCustomBackground
@@ -126,7 +140,7 @@ MouseArea {
         anchors.margins: mediaControlsMouseArea.contentInset
         layoutDirection: mediaControlsMouseArea.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
-        ColumnLayout {
+        Item {
             id: leftColumn
 
             visible: !mediaControlsMouseArea.hideNowPlayingArea
@@ -134,43 +148,54 @@ MouseArea {
             Layout.minimumWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
             Layout.preferredWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
             Layout.maximumWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
-            spacing: 0
 
-            ColumnLayout {
-                id: nowPlayingLabels
+            Item {
+                id: labelSlot
 
-                Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                Layout.fillWidth: true
+                readonly property bool showsArtwork: mediaControlsMouseArea.configuredUseLabelArtwork && player.artUrl.length > 0
+                // Text is rasterized at whole pixel sizes, then lightly scaled between steps for smoother motion.
+                readonly property real textTargetFontSize: Math.max(1, mediaControlsMouseArea.effectiveLabelFontSize * mediaControlsMouseArea.labelContentScale)
+                readonly property int textRasterFontSize: Math.max(1, Math.round(textTargetFontSize))
+                readonly property real textResidualScale: textTargetFontSize / textRasterFontSize
+
+                x: mediaControlsMouseArea.labelsOnRight ? 0 : leftColumn.width - width
+                y: 0
+                width: mediaControlsMouseArea.labelContentSize
+                height: mediaControlsMouseArea.labelContentSize
+                clip: true
                 visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
                 LabelContent {
-                    Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                    Layout.preferredWidth: mediaControlsMouseArea.labelContentSize
-                    Layout.preferredHeight: mediaControlsMouseArea.labelContentSize
-                    Layout.maximumWidth: mediaControlsMouseArea.labelRailSize
-                    Layout.maximumHeight: mediaControlsMouseArea.labelRailSize
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    width: labelSlot.showsArtwork ? mediaControlsMouseArea.labelRailSize : mediaControlsMouseArea.labelContentSize / labelSlot.textResidualScale
+                    height: labelSlot.showsArtwork ? mediaControlsMouseArea.labelRailSize : mediaControlsMouseArea.labelContentSize / labelSlot.textResidualScale
+                    scale: labelSlot.showsArtwork ? mediaControlsMouseArea.labelContentScale : labelSlot.textResidualScale
+                    transformOrigin: Item.TopLeft
                     artworkSource: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
                     labelLines: mediaControlsMouseArea.effectiveLabelLines
                     fontFamily: mediaControlsMouseArea.configuredFontFamily
-                    fontPixelSize: mediaControlsMouseArea.effectiveLabelFontSize
+                    fontPixelSize: labelSlot.showsArtwork ? mediaControlsMouseArea.effectiveLabelFontSize : labelSlot.textRasterFontSize
                     textColor: mediaControlsMouseArea.effectiveForegroundColor
                     textShadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
                     verticalSpacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
                     horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
                     borderRadius: mediaControlsMouseArea.effectiveImageBorderRadius
-                    artworkSize: mediaControlsMouseArea.labelContentSize
+                    artworkSize: labelSlot.showsArtwork ? mediaControlsMouseArea.labelRailSize : mediaControlsMouseArea.labelContentSize / labelSlot.textResidualScale
                 }
-
             }
 
             RowLayout {
                 id: mediaControls
 
-                Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignLeft : Qt.AlignRight
-                Layout.topMargin: visible ? mediaControlsMouseArea.labelControlGap : 0
-                enabled: mediaControlsMouseArea.mediaControlsShown
-                opacity: mediaControlsMouseArea.mediaControlsShown ? 1 : 0
-                visible: mediaControlsMouseArea.mediaControlsShown
+                x: mediaControlsMouseArea.labelsOnRight ? 0 : leftColumn.width - width
+                y: mediaControlsMouseArea.labelContentSize
+                width: implicitWidth
+                height: mediaControlsMouseArea.buttonSize
+                clip: true
+                enabled: mediaControlsMouseArea.mediaControlsTargetShown
+                opacity: mediaControlsMouseArea.controlsReveal
+                visible: mediaControlsMouseArea.mediaControlsTargetShown || opacity > 0
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize
@@ -186,7 +211,6 @@ MouseArea {
                         source: "media-skip-backward"
                         color: mediaControlsMouseArea.effectiveForegroundColor
                     }
-
                 }
 
                 QQC2.Button {
@@ -205,7 +229,6 @@ MouseArea {
                         source: player.playbackStatus === 2 ? "media-playback-pause" : "media-playback-start"
                         color: mediaControlsMouseArea.effectiveForegroundColor
                     }
-
                 }
 
                 QQC2.Button {
@@ -219,19 +242,8 @@ MouseArea {
                         source: "media-skip-forward"
                         color: mediaControlsMouseArea.effectiveForegroundColor
                     }
-
                 }
-
-                Behavior on opacity {
-                    PropertyAnimation {
-                        duration: 250
-                        easing.type: Easing.InOutQuad
-                    }
-
-                }
-
             }
-
         }
 
         Item {
@@ -252,7 +264,6 @@ MouseArea {
                 height: Math.round(parent.height * mediaControlsMouseArea.effectiveSeparatorHeight / 100)
                 color: mediaControlsMouseArea.configuredHideSeparator ? "transparent" : mediaControlsMouseArea.effectiveForegroundColor
             }
-
         }
 
         ColumnLayout {
@@ -289,9 +300,6 @@ MouseArea {
                 elide: Text.ElideRight
                 horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
-
         }
-
     }
-
 }

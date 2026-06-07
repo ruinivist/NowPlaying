@@ -7,13 +7,13 @@ Item {
     required property string artworkSource
     required property var labelLines
     required property string fontFamily
-    required property int fontPixelSize
+    required property real fontPixelSize
     required property string textColor
     required property bool textShadowEnabled
     required property int verticalSpacing
     required property int horizontalAlignment
     required property int borderRadius
-    required property int artworkSize
+    required property real artworkSize
     property string currentArtworkSource: ""
     property string incomingArtworkSource: ""
     property real currentArtworkOpacity: 0

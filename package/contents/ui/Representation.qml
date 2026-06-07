@@ -36,7 +36,8 @@ MouseArea {
     readonly property int contentInset: 8
     readonly property int labelRailSize: Math.max(0, height - contentInset * 2)
     readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
-    readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize) / labelRailSize) : 1
+    readonly property int artworkControlsGap: configuredUseLabelArtwork && player.artUrl.length > 0 ? 2 : 0
+    readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1
     property real labelContentScale: mediaControlsTargetShown ? labelShrunkScale : 1
     readonly property real controlsReveal: {
         const range = 1 - labelShrunkScale;
@@ -189,7 +190,7 @@ MouseArea {
                 id: mediaControls
 
                 x: mediaControlsMouseArea.labelsOnRight ? 0 : leftColumn.width - width
-                y: mediaControlsMouseArea.labelContentSize
+                y: mediaControlsMouseArea.labelContentSize + mediaControlsMouseArea.artworkControlsGap
                 width: implicitWidth
                 height: mediaControlsMouseArea.buttonSize
                 clip: true

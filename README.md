@@ -2,9 +2,9 @@
 
 NowPlaying is a KDE Plasma 6 widget inspired by the Cleartext Rainmeter widget. It displays the current song and artist with compact media controls, and is meant to live on the desktop rather than in a panel.
 
-Now on KDE 6: https://www.pling.com/p/2195583/
+https://www.pling.com/p/2195583/
 
-> Too little too late but I plan to update it regularly now if any issues are created - ruinivist
+> I think this is pretty much in a "done" state now feature-wise, except of course any bug fixes
 
 ## Prerequisites
 
@@ -48,48 +48,6 @@ Create a distributable package:
 
 ```bash
 make package
-```
-
-The package is written to `build/org.ruiny.NowPlaying.plasmoid`.
-
-## Project Structure
-
-```text
-.
-├── package/
-│   ├── metadata.json
-│   └── contents/
-│       ├── config/
-│       │   ├── config.qml
-│       │   └── main.xml
-│       └── ui/
-│           ├── configGeneral.qml
-│           ├── main.qml
-│           ├── Player.qml
-│           └── Representation.qml
-├── scripts/
-│   └── watch.sh
-└── Makefile
-```
-
-## Maintenance
-
-Format files:
-
-```bash
-make format
-```
-
-Run lint checks:
-
-```bash
-make lint
-```
-
-Enable the repository pre-commit hook:
-
-```bash
-make hooks-install
 ```
 
 ## Customization

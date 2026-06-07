@@ -34,7 +34,10 @@ MouseArea {
     readonly property bool usesCustomBackground: configuredBackgroundStyle === "custom"
     readonly property int hideModeHorizontalPadding: 8
     readonly property int contentInset: 8
-    readonly property int labelRailSize: Math.max(0, height - contentInset * 2)
+    readonly property int availableContentWidth: Math.max(0, width - contentInset * 2)
+    readonly property int separatorReservedWidth: nowPlayingLabelsVisible && !hideNowPlayingArea ? 1 + effectiveSeparatorGapLabel + effectiveSeparatorGapTrack : 0
+    readonly property int maxLabelRailSize: Math.max(0, availableContentWidth - separatorReservedWidth)
+    readonly property int labelRailSize: Math.max(0, Math.min(height - contentInset * 2, maxLabelRailSize))
     readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
     readonly property int artworkControlsGap: configuredUseLabelArtwork && player.artUrl.length > 0 ? 2 : 0
     readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1

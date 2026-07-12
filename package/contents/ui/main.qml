@@ -45,6 +45,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredSourcePriority: plasmoid.configuration.sourcePriority
     // qmllint disable missing-property
+    property bool configuredSourceWhitelist: plasmoid.configuration.sourceWhitelist
+    // qmllint disable missing-property
     property int configuredTrackTextVerticalSpacing: plasmoid.configuration.trackTextVerticalSpacing
     // qmllint disable missing-property
     property int configuredLabelVerticalSpacing: plasmoid.configuration.labelVerticalSpacing
@@ -77,6 +79,7 @@ PlasmoidItem {
         id: player
 
         sourcePriority: root.configuredSourcePriority
+        sourceWhitelist: root.configuredSourceWhitelist
     }
 
     fullRepresentation: Representation {

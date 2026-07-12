@@ -26,6 +26,7 @@ KCM.SimpleKCM {
     property alias cfg_textShadowEnabled: textShadowCheckBox.checked
     property alias cfg_showMediaControls: showMediaControlsCheckBox.checked
     property alias cfg_sourcePriority: sourcePriorityField.text
+    property alias cfg_sourceWhitelist: sourceWhitelistCheckBox.checked
     property alias cfg_trackTextVerticalSpacing: trackTextVerticalSpacingSpinBox.value
     property alias cfg_labelVerticalSpacing: labelVerticalSpacingSpinBox.value
     property alias cfg_separatorGapLabel: separatorGapLabelSpinBox.value
@@ -59,6 +60,9 @@ KCM.SimpleKCM {
         "text": i18n("Solid background"),
         "value": "default"
     }]
+    readonly property bool hasSourcePriorityEntries: sourcePriorityField.text.split(",").some((entry) => {
+        return normalizeDesktopEntry(entry).length > 0;
+    })
 
     function syncComboByValue(comboBox, options, configuredValue, fallbackValue) {
         const requestedValue = configuredValue || fallbackValue;
@@ -97,6 +101,7 @@ KCM.SimpleKCM {
         detectedSources = sources;
     }
 
+    Component.onCompleted: cfg_sourceWhitelist = hasSourcePriorityEntries && cfg_sourceWhitelist
     onCfg_fontFamilyChanged: {
         const index = availableFonts.indexOf(cfg_fontFamily);
         if (index >= 0 && fontFamilyComboBox.currentIndex !== index)
@@ -222,7 +227,16 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Source priority:")
             Layout.fillWidth: true
-            placeholderText: i18n("spotify, firefox")
+            placeholderText: i18n("example: spotify, firefox")
+            onTextChanged: configRoot.cfg_sourceWhitelist = configRoot.hasSourcePriorityEntries && configRoot.cfg_sourceWhitelist
+        }
+
+        QQC2.CheckBox {
+            id: sourceWhitelistCheckBox
+
+            Kirigami.FormData.label: ""
+            text: i18n("Only use listed sources")
+            enabled: configRoot.hasSourcePriorityEntries
         }
 
         QQC2.Label {

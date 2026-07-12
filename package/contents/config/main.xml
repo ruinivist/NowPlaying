@@ -74,6 +74,10 @@ PLAYING]]></default>
             <label>Source priority</label>
             <default></default>
         </entry>
+        <entry name="sourceWhitelist" type="Bool">
+            <label>Only use listed sources</label>
+            <default>false</default>
+        </entry>
         <entry name="trackTextVerticalSpacing" type="Int">
             <label>Track text vertical spacing</label>
             <default>5</default>

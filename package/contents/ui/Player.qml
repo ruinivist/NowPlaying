@@ -14,6 +14,7 @@ QtObject {
     readonly property int containerRole: Qt.UserRole + 1
     property string sourceName: "any"
     property string sourcePriority: ""
+    property bool sourceWhitelist: false
     property var mpris2Model
     property int modelRevision: 0
     readonly property var normalizedSourcePriority: parseSourcePriority(sourcePriority)
@@ -99,6 +100,9 @@ QtObject {
                 return matchedPlayer;
 
         }
+        if (sourceWhitelist && normalizedSourcePriority.length > 0)
+            return null;
+
         return mpris2Model.currentPlayer || null;
     }
 

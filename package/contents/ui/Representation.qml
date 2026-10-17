@@ -42,11 +42,11 @@ MouseArea {
     readonly property int hideModeHorizontalPadding: 8
     readonly property int contentInset: 8
     readonly property int availableContentWidth: Math.max(0, width - contentInset * 2)
-    readonly property int separatorReservedWidth: nowPlayingLabelsVisible && !hideNowPlayingArea ? 1 + effectiveSeparatorGapLabel + effectiveSeparatorGapTrack : 0
+    readonly property int separatorReservedWidth: !hideNowPlayingArea ? 1 + effectiveSeparatorGapLabel + effectiveSeparatorGapTrack : 0
     readonly property int maxLabelRailSize: Math.max(0, availableContentWidth - separatorReservedWidth)
     // Keep artwork and labels sized to the track row instead of the taller widget.
     readonly property int labelRailSize: Math.max(0, Math.min(trackRow.height, maxLabelRailSize))
-    readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
+    readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && !hideNowPlayingArea
     readonly property int artworkControlsGap: configuredUseLabelArtwork && player.artUrl.length > 0 ? 2 : 0
     readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1
     property real labelContentScale: mediaControlsTargetShown ? labelShrunkScale : 1
@@ -75,16 +75,8 @@ MouseArea {
     readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
     readonly property bool rawHoverActive: mediaControlsEnabled && rootHoverHandler.hovered
     readonly property bool controlsHoverActive: mediaControlsEnabled && (rawHoverActive || hoverExitTimer.running)
-    readonly property bool nowPlayingLabelsVisible: {
-        if (effectiveLabelVisibilityMode === "always")
-            return true;
 
-        if (effectiveLabelVisibilityMode === "never")
-            return false;
-
-        return hasTrackInfo;
-    }
-
+    visible: hasTrackInfo || effectiveLabelVisibilityMode === "always"
     focus: true
     acceptedButtons: Qt.NoButton
     hoverEnabled: true
@@ -180,7 +172,6 @@ MouseArea {
                 width: mediaControlsMouseArea.labelContentSize
                 height: mediaControlsMouseArea.labelContentSize
                 clip: true
-                visible: mediaControlsMouseArea.nowPlayingLabelsVisible
 
                 LabelContent {
                     anchors.left: parent.left
@@ -266,7 +257,7 @@ MouseArea {
         Item {
             id: separatorContainer
 
-            visible: mediaControlsMouseArea.nowPlayingLabelsVisible && !mediaControlsMouseArea.hideNowPlayingArea
+            visible: !mediaControlsMouseArea.hideNowPlayingArea
             Layout.fillHeight: true
             Layout.leftMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapLabel : 0
             Layout.rightMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapTrack : 0

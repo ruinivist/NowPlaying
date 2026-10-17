@@ -1,0 +1,20 @@
+# Private capture settings used by the NowPlaying bridge.
+# The bridge fills the named placeholders before passing this file to CAVA.
+
+[general]
+bars = @BAR_COUNT@
+framerate = @FRAME_RATE@
+# Sleep during silence; waking can take up to one second.
+sleep_timer = 1
+
+[input]
+source = auto
+
+[output]
+# Each frame contains one unsigned byte per bar, written directly to stdout.
+method = raw
+raw_target = /dev/stdout
+data_format = binary
+bit_format = 8bit
+channels = mono
+mono_option = average

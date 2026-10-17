@@ -13,7 +13,7 @@ You need the basic KDE and Qt 6 tools for Plasma widget development.
 On Arch Linux, this is roughly:
 
 ```bash
-sudo pacman -S plasma-sdk inotify-tools kirigami2 qt6-base qt6-declarative
+sudo pacman -S plasma-sdk kirigami2 qt6-base qt6-declarative
 ```
 
 ## Development
@@ -32,11 +32,7 @@ make dev MODE=desktop
 make dev MODE=hidpi
 ```
 
-Use hot reload while editing:
-
-```bash
-make watch
-```
+After editing QML or C++, close the viewer and run `make dev` again to rebuild and reload the widget.
 
 Install or upgrade the widget in your local Plasma package store:
 

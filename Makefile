@@ -1,10 +1,11 @@
 # Makefile for KDE 6 Plasma Widget Development
 
 # Variables
-PACKAGE_DIR := package
-METADATA_FILE := $(PACKAGE_DIR)/metadata.json
+SOURCE_PACKAGE_DIR := package
+METADATA_FILE := $(SOURCE_PACKAGE_DIR)/metadata.json
 WIDGET_ID := $(shell grep -oP '"Id": "\K[^"]+' $(METADATA_FILE))
 BUILD_DIR := build
+PACKAGE_DIR := $(BUILD_DIR)/package
 PLASMOID_FILE := $(WIDGET_ID).plasmoid
 
 # Default target
@@ -14,7 +15,7 @@ help:
 	@echo ""
 	@echo "Usage:"
 	@echo "  make dev           Run widget in plasmoidviewer from local package (MODE=panel|desktop|hidpi)"
-	@echo "  make watch         Start Development Mode with Hot Reload"
+	@echo "  make build         Compile the native plugin and stage the widget"
 	@echo "  make install       Install/upgrade widget in local Plasma package store"
 	@echo "  make uninstall     Remove widget from local system"
 	@echo "  make package       Build .plasmoid file for distribution"
@@ -30,11 +31,17 @@ hooks-install:
 	git config core.hooksPath .githooks
 	@echo "Configured core.hooksPath=.githooks"
 
-# Testing Targets
+# Build and Preview
+# Build a self-contained package with its native QML plugin.
+.PHONY: build
+build:
+	cmake -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release
+	cmake --build $(BUILD_DIR) --parallel
+
 # Run plasmoidviewer from the local package directory.
 # Optional MODE values: panel, desktop, hidpi (omit MODE for default).
 .PHONY: dev
-dev:
+dev: build
 	@mode="$(MODE)"; \
 	case "$$mode" in \
 		""|default) \
@@ -51,26 +58,17 @@ dev:
 	esac
 
 # Development Tools
-# Start file watcher for iterative development and reload workflow.
-.PHONY: watch
-watch:
-	./scripts/watch.sh
-
 # Format all QML files in the package directory in-place.
 .PHONY: format-qml
 format-qml:
 	@command -v qmlformat >/dev/null 2>&1 || { echo "Missing required tool: qmlformat"; exit 1; }
-	find $(PACKAGE_DIR) -name "*.qml" -type f -exec qmlformat -i {} +
+	find $(SOURCE_PACKAGE_DIR) -name "*.qml" -type f -exec qmlformat -i {} +
 
 # Format JSON/YAML/Markdown files with prettier.
 .PHONY: format-prettier
 format-prettier:
 	@command -v prettier >/dev/null 2>&1 || { echo "Missing required tool: prettier"; exit 1; }
-	find . -type f \
-		\( -name "*.json" -o -name "*.yml" -o -name "*.yaml" -o -name "*.md" -o -name ".prettierrc" \) \
-		-not -path "./.git/*" \
-		-not -path "./build/*" \
-		-print0 | xargs -0 -r prettier --write
+	git ls-files -z --cached --others --exclude-standard -- '*.json' '*.yml' '*.yaml' '*.md' .prettierrc | xargs -0 -r prettier --write
 
 # Run all formatting passes.
 .PHONY: format
@@ -82,7 +80,7 @@ format: format-qml format-prettier
 lint-qml-format:
 	@command -v qmlformat >/dev/null 2>&1 || { echo "Missing required tool: qmlformat"; exit 1; }
 	@status=0; \
-	find $(PACKAGE_DIR) -name "*.qml" -type f -print0 | \
+	find $(SOURCE_PACKAGE_DIR) -name "*.qml" -type f -print0 | \
 	xargs -0 -r -I{} sh -c 'tmp_file="$$(mktemp)"; qmlformat "$$1" > "$$tmp_file"; if ! cmp -s "$$1" "$$tmp_file"; then echo "QML format mismatch: $$1"; rm -f "$$tmp_file"; exit 1; fi; rm -f "$$tmp_file"' _ {} || status=1; \
 	if [ "$$status" -ne 0 ]; then \
 		echo "Run 'make format-qml' to fix QML formatting."; \
@@ -91,7 +89,7 @@ lint-qml-format:
 
 # Run semantic QML lint checks.
 .PHONY: lint-qml
-lint-qml:
+lint-qml: build
 	@command -v qmllint >/dev/null 2>&1 || { echo "Missing required tool: qmllint"; exit 1; }
 	find $(PACKAGE_DIR) -name "*.qml" -type f -print0 | xargs -0 -r qmllint
 
@@ -99,11 +97,7 @@ lint-qml:
 .PHONY: lint-prettier
 lint-prettier:
 	@command -v prettier >/dev/null 2>&1 || { echo "Missing required tool: prettier"; exit 1; }
-	find . -type f \
-		\( -name "*.json" -o -name "*.yml" -o -name "*.yaml" -o -name "*.md" -o -name ".prettierrc" \) \
-		-not -path "./.git/*" \
-		-not -path "./build/*" \
-		-print0 | xargs -0 -r prettier --check
+	git ls-files -z --cached --others --exclude-standard -- '*.json' '*.yml' '*.yaml' '*.md' .prettierrc | xargs -0 -r prettier --check
 
 # Run all lint and formatting checks.
 .PHONY: lint
@@ -112,7 +106,7 @@ lint: lint-qml-format lint-qml lint-prettier
 # Installation
 # Install/upgrade widget in local Plasma package store.
 .PHONY: install
-install:
+install: build
 	@if kpackagetool6 --type Plasma/Applet --show $(WIDGET_ID) >/dev/null 2>&1; then \
 		echo "Upgrading existing package: $(WIDGET_ID)"; \
 		kpackagetool6 --type Plasma/Applet --upgrade $(PACKAGE_DIR); \
@@ -123,7 +117,7 @@ install:
 
 # Upgrade an already installed widget package with local changes.
 .PHONY: upgrade
-upgrade:
+upgrade: build
 	kpackagetool6 --type Plasma/Applet --upgrade $(PACKAGE_DIR)
 
 # Remove installed widget package from local system.
@@ -139,12 +133,12 @@ uninstall:
 # Packaging
 # Create distributable .plasmoid archive from current package contents.
 .PHONY: package
-package:
+package: build
 	mkdir -p $(BUILD_DIR)
 	rm -f $(BUILD_DIR)/$(PLASMOID_FILE)
 
 	# Zip package contents
-	cd $(PACKAGE_DIR) && zip -r ../$(BUILD_DIR)/$(PLASMOID_FILE) .
+	cd $(PACKAGE_DIR) && zip -r ../$(PLASMOID_FILE) .
 
 	@echo ""
 	@echo "Package built at: $(BUILD_DIR)/$(PLASMOID_FILE)"

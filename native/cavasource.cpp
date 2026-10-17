@@ -163,7 +163,8 @@ bool CavaSource::prepareConfig() {
   }
   config.replace("@BAR_COUNT@", QByteArray::number(m_barCount));
   config.replace("@FRAME_RATE@", QByteArray::number(CavaFrames::FrameRate));
-  config.replace("@SMOOTHING@", QByteArray::number(m_smoothing));
+  // extreme values were very unstable
+  config.replace("@SMOOTHING@", QByteArray::number(qRound(10 + m_smoothing * 0.8)));
 
   if ((!m_config.isOpen() && !m_config.open()) || !m_config.resize(0) ||
       !m_config.seek(0)) {

@@ -39,7 +39,7 @@ KCM.SimpleKCM {
         QQC2.SpinBox {
             id: smoothing
 
-            Kirigami.FormData.label: i18n("Smoothing (0 = immediate, 100 = smooth):")
+            Kirigami.FormData.label: i18n("Smoothing (0 = least, 100 = most):")
             from: 0
             to: 100
             editable: true

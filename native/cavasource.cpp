@@ -10,7 +10,7 @@
 // Read binary frames from its stdout
 //         |
 //         v
-// Publish 128 levels and emit frameChanged
+// Publish configured levels and emit frameChanged
 
 #include "cavasource.h"
 
@@ -23,11 +23,12 @@
 bool CavaFrames::append(const QByteArray &bytes) {
   pending += bytes;
   // Pipe reads do not align with frame boundaries; leave the partial tail.
-  const qsizetype complete = pending.size() / BarCount * BarCount;
+  const qsizetype complete = pending.size() / values.size() * values.size();
   if (!complete)
     return false;
 
-  const QByteArray latest = pending.mid(complete - BarCount, BarCount);
+  const QByteArray latest =
+      pending.mid(complete - values.size(), values.size());
   pending.remove(0, complete);
   if (latest == values)
     return false;
@@ -38,6 +39,17 @@ bool CavaFrames::append(const QByteArray &bytes) {
 // ---------- Process lifecycle ----------
 
 CavaSource::CavaSource(QObject *parent) : QObject(parent) {
+  m_reconfigureTimer.setSingleShot(true);
+  m_reconfigureTimer.setInterval(0);
+  // Settings applied together need only one capture restart.
+  connect(&m_reconfigureTimer, &QTimer::timeout, this, [this] {
+    if (!m_active)
+      return;
+    if (m_process.state() == QProcess::NotRunning)
+      start();
+    else
+      stop();
+  });
   m_killTimer.setSingleShot(true);
   m_killTimer.setInterval(500);
   connect(&m_killTimer, &QTimer::timeout, &m_process, &QProcess::kill);
@@ -72,16 +84,52 @@ void CavaSource::setActive(bool active) {
     if (m_process.state() == QProcess::NotRunning)
       start();
   } else {
+    m_reconfigureTimer.stop();
     clear();
-    if (m_process.state() != QProcess::NotRunning) {
-      m_stopping = true;
-      m_process.terminate();
-      m_killTimer.start();
-    }
+    stop();
   }
 }
 
+void CavaSource::setBarCount(int barCount) {
+  barCount = qBound(1, barCount, 512);
+  if (m_barCount == barCount)
+    return;
+  m_barCount = barCount;
+  reconfigure();
+  Q_EMIT barCountChanged();
+}
+
+void CavaSource::setSmoothing(int smoothing) {
+  smoothing = qBound(0, smoothing, 100);
+  if (m_smoothing == smoothing)
+    return;
+  m_smoothing = smoothing;
+  Q_EMIT smoothingChanged();
+  reconfigure();
+}
+
+void CavaSource::reconfigure() {
+  clear();
+  if (m_active)
+    m_reconfigureTimer.start();
+}
+
+void CavaSource::stop() {
+  if (m_process.state() == QProcess::NotRunning || m_stopping)
+    return;
+  m_stopping = true;
+  m_process.terminate();
+  m_killTimer.start();
+}
+
 void CavaSource::start() {
+  m_reconfigureTimer.stop();
+  // A restarted child must never inherit bytes from the previous frame stream.
+  if (m_process.isOpen()) {
+    m_process.readAllStandardOutput();
+    m_process.readAllStandardError();
+  }
+  clear();
   m_killTimer.stop();
   m_stopping = false;
   m_error.clear();
@@ -103,9 +151,6 @@ void CavaSource::start() {
 /// Writes the bundled settings to the filesystem path CAVA requires.
 /// Reuses the private file across activations; destruction removes it.
 bool CavaSource::prepareConfig() {
-  if (m_config.isOpen())
-    return true;
-
   QFile settings(QStringLiteral(":/nowplaying/cava.conf.in"));
   if (!settings.open(QIODevice::ReadOnly)) {
     fail(settings.errorString());
@@ -116,10 +161,12 @@ bool CavaSource::prepareConfig() {
     fail(settings.errorString());
     return false;
   }
-  config.replace("@BAR_COUNT@", QByteArray::number(CavaFrames::BarCount));
+  config.replace("@BAR_COUNT@", QByteArray::number(m_barCount));
   config.replace("@FRAME_RATE@", QByteArray::number(CavaFrames::FrameRate));
+  config.replace("@SMOOTHING@", QByteArray::number(m_smoothing));
 
-  if (!m_config.open()) {
+  if ((!m_config.isOpen() && !m_config.open()) || !m_config.resize(0) ||
+      !m_config.seek(0)) {
     fail(m_config.errorString());
     return false;
   }
@@ -135,7 +182,8 @@ bool CavaSource::prepareConfig() {
 
 void CavaSource::readOutput() {
   const QByteArray bytes = m_process.readAllStandardOutput();
-  if (m_active && !m_stopping && m_frames.append(bytes))
+  if (m_active && !m_stopping && !m_reconfigureTimer.isActive() &&
+      m_frames.append(bytes))
     Q_EMIT frameChanged();
 }
 
@@ -181,7 +229,7 @@ void CavaSource::handleFinished(int exitCode, QProcess::ExitStatus status) {
 
 void CavaSource::clear() {
   m_frames.pending.clear();
-  const QByteArray zero(CavaFrames::BarCount, '\0');
+  const QByteArray zero(m_barCount, '\0');
   if (m_frames.values != zero) {
     m_frames.values = zero;
     Q_EMIT frameChanged();
@@ -199,7 +247,7 @@ void CavaSource::fail(const QString &message) {
 
 QVariantList CavaSource::levels() const {
   QVariantList result;
-  result.reserve(CavaFrames::BarCount);
+  result.reserve(m_barCount);
   for (unsigned char value : m_frames.values)
     result.append(int(value));
   return result;

@@ -10,6 +10,9 @@ sleep_timer = 1
 [input]
 source = auto
 
+[smoothing]
+noise_reduction = @SMOOTHING@
+
 [output]
 # Each frame contains one unsigned byte per bar, written directly to stdout.
 method = raw

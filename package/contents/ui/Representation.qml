@@ -27,6 +27,10 @@ MouseArea {
     property int configuredSeparatorGapTrack: 4
     property int configuredSeparatorHeight: 90
     property bool configuredHideSeparator: false
+    property int configuredVisualizerBarHeight: 72
+    property int configuredVisualizerBarCount: 128
+    property int configuredVisualizerSmoothing: 0
+    property string configuredVisualizerScale: "sqrt"
     readonly property double buttonSize: 16
     readonly property string effectiveLabelVisibilityMode: configuredLabelVisibilityMode === "always" || configuredLabelVisibilityMode === "never" ? configuredLabelVisibilityMode : "auto"
     readonly property bool labelsOnRight: configuredLabelPlacement === "right"
@@ -315,6 +319,11 @@ MouseArea {
 
     Visualizer {
         id: visualizer
+
+        barHeight: mediaControlsMouseArea.configuredVisualizerBarHeight
+        barCount: mediaControlsMouseArea.configuredVisualizerBarCount
+        smoothing: mediaControlsMouseArea.configuredVisualizerSmoothing
+        scaleMode: mediaControlsMouseArea.configuredVisualizerScale
 
         x: mediaControlsMouseArea.contentInset
         y: trackRow.y + trackRow.height + 16

@@ -58,6 +58,15 @@ PlasmoidItem {
     property int configuredSeparatorHeight: plasmoid.configuration.separatorHeight
     // qmllint disable missing-property
     property bool configuredHideSeparator: plasmoid.configuration.hideSeparator
+    // qmllint disable missing-property
+    property int configuredVisualizerBarHeight: plasmoid.configuration.visualizerBarHeight
+    // qmllint disable missing-property
+    property int configuredVisualizerBarCount: plasmoid.configuration.visualizerBarCount
+    // qmllint disable missing-property
+    property int configuredVisualizerSmoothing: plasmoid.configuration.visualizerSmoothing
+    // qmllint disable missing-property
+    property string configuredVisualizerScale: plasmoid.configuration.visualizerScale
+    readonly property int visualizerHeight: Math.max(1, Math.min(512, configuredVisualizerBarHeight))
     readonly property int resolvedBackgroundHints: {
         if (configuredBackgroundStyle === "default")
             return PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground;
@@ -69,10 +78,10 @@ PlasmoidItem {
     }
 
     width: Kirigami.Units.gridUnit * 25
-    // Add 72 pixels of bars and a 16-pixel gap without shrinking the original track row.
-    height: Kirigami.Units.gridUnit * 5 + 88
+    // Reserve the configured bars and gap without shrinking the original track row.
+    height: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
     Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-    Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + 88
+    Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
     Plasmoid.backgroundHints: resolvedBackgroundHints
     opacity: configuredOpacity / 100
 
@@ -87,7 +96,7 @@ PlasmoidItem {
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + 88
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
@@ -111,13 +120,17 @@ PlasmoidItem {
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
+        configuredVisualizerBarHeight: root.visualizerHeight
+        configuredVisualizerBarCount: root.configuredVisualizerBarCount
+        configuredVisualizerSmoothing: root.configuredVisualizerSmoothing
+        configuredVisualizerScale: root.configuredVisualizerScale
     }
 
     compactRepresentation: Representation {
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + 88
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
@@ -141,5 +154,9 @@ PlasmoidItem {
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
+        configuredVisualizerBarHeight: root.visualizerHeight
+        configuredVisualizerBarCount: root.configuredVisualizerBarCount
+        configuredVisualizerSmoothing: root.configuredVisualizerSmoothing
+        configuredVisualizerScale: root.configuredVisualizerScale
     }
 }

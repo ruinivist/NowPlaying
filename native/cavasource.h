@@ -29,12 +29,16 @@ public:
 // ---------- Process lifecycle ----------
 
 /// Owns capture for one QML consumer without changing the user's CAVA settings.
-/// Publishes 128 unsigned levels (0–255); inactive or failed capture is flat.
+/// Publishes the configured number of unsigned levels (0–255); inactive or
+/// failed capture is flat.
 class CavaSource : public QObject {
   Q_OBJECT
   QML_ELEMENT
   Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
-  Q_PROPERTY(int barCount READ barCount CONSTANT)
+  Q_PROPERTY(
+      int barCount READ barCount WRITE setBarCount NOTIFY barCountChanged)
+  Q_PROPERTY(
+      int smoothing READ smoothing WRITE setSmoothing NOTIFY smoothingChanged)
   Q_PROPERTY(QVariantList levels READ levels NOTIFY frameChanged)
   Q_PROPERTY(QString error READ error NOTIFY errorChanged)
 
@@ -42,7 +46,10 @@ public:
   explicit CavaSource(QObject *parent = nullptr);
   ~CavaSource() override;
 
-  int barCount() const { return CavaFrames::BarCount; }
+  int barCount() const { return m_barCount; }
+  void setBarCount(int barCount);
+  int smoothing() const { return m_smoothing; }
+  void setSmoothing(int smoothing);
   bool active() const { return m_active; }
 
   /// Requests capture; true does not guarantee that CAVA is running.
@@ -53,6 +60,8 @@ public:
 
 Q_SIGNALS:
   void activeChanged();
+  void barCountChanged();
+  void smoothingChanged();
   void frameChanged();
   void errorChanged();
 
@@ -60,6 +69,8 @@ private:
   // ---------- Capture and process events ----------
 
   void start();
+  void stop();
+  void reconfigure();
   bool prepareConfig();
   void readOutput();
   void readStderr();
@@ -77,6 +88,9 @@ private:
   QProcess m_process;
   QTemporaryFile m_config;
   QTimer m_killTimer;
+  QTimer m_reconfigureTimer;
+  int m_barCount = CavaFrames::BarCount;
+  int m_smoothing = 0;
   QString m_error;
   QString m_stderr;
   // QML's capture request, even if CAVA has failed to start.

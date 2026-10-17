@@ -102,5 +102,27 @@ PLAYING]]></default>
             <label>Hide separator</label>
             <default>false</default>
         </entry>
+        <entry name="visualizerBarHeight" type="Int">
+            <label>Visualiser bar height</label>
+            <default>72</default>
+            <min>1</min>
+            <max>512</max>
+        </entry>
+        <entry name="visualizerBarCount" type="Int">
+            <label>Visualiser number of bars</label>
+            <default>128</default>
+            <min>1</min>
+            <max>512</max>
+        </entry>
+        <entry name="visualizerSmoothing" type="Int">
+            <label>Visualiser smoothing</label>
+            <default>0</default>
+            <min>0</min>
+            <max>100</max>
+        </entry>
+        <entry name="visualizerScale" type="String">
+            <label>Visualiser scale</label>
+            <default>sqrt</default>
+        </entry>
     </group>
 </kcfg>

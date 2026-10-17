@@ -64,9 +64,11 @@ The widget appearance can be tuned from the Plasma widget settings, including:
 
 ## Release Upload
 
+The release workflow calls the reusable workflow from
+`ruinivist/kde-6-widget-starter` and passes this widget's Pling project ID.
+
 Required GitHub repository secrets:
 
-- `PLING_PROJECT_ID`
 - `PLING_USERNAME`
 - `PLING_PASSWORD`
 

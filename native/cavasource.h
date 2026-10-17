@@ -16,7 +16,7 @@
 /// Used by CavaSource to turn the stdout stream into fixed-size QML updates.
 class CavaFrames {
 public:
-  static constexpr int BarCount = 128;
+  static constexpr int BarCount = 100;
   static constexpr int FrameRate = 30;
 
   /// Returns true only when a complete frame changes the published values.
@@ -90,7 +90,7 @@ private:
   QTimer m_killTimer;
   QTimer m_reconfigureTimer;
   int m_barCount = CavaFrames::BarCount;
-  int m_smoothing = 0;
+  int m_smoothing = 10;
   QString m_error;
   QString m_stderr;
   // QML's capture request, even if CAVA has failed to start.

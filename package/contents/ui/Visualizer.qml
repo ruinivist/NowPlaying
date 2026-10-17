@@ -10,10 +10,10 @@ Item {
 
     // ---------- Capture ----------
 
-    property int barHeight: 72
-    property int barCount: 128
-    property int smoothing: 0
-    property string scaleMode: "sqrt"
+    property int barHeight: 100
+    property int barCount: 100
+    property int smoothing: 10
+    property string scaleMode: "linear"
     readonly property var levels: cava.levels
 
     implicitHeight: Math.max(1, Math.min(512, barHeight))

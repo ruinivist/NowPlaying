@@ -27,10 +27,10 @@ MouseArea {
     property int configuredSeparatorGapTrack: 4
     property int configuredSeparatorHeight: 90
     property bool configuredHideSeparator: false
-    property int configuredVisualizerBarHeight: 72
-    property int configuredVisualizerBarCount: 128
-    property int configuredVisualizerSmoothing: 0
-    property string configuredVisualizerScale: "sqrt"
+    property int configuredVisualizerBarHeight: 100
+    property int configuredVisualizerBarCount: 100
+    property int configuredVisualizerSmoothing: 10
+    property string configuredVisualizerScale: "linear"
     readonly property double buttonSize: 16
     readonly property string effectiveLabelVisibilityMode: configuredLabelVisibilityMode === "always" || configuredLabelVisibilityMode === "never" ? configuredLabelVisibilityMode : "auto"
     readonly property bool labelsOnRight: configuredLabelPlacement === "right"

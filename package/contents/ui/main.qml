@@ -69,9 +69,10 @@ PlasmoidItem {
     }
 
     width: Kirigami.Units.gridUnit * 25
-    height: Kirigami.Units.gridUnit * 5
+    // Add 72 pixels of bars and a 16-pixel gap without shrinking the original track row.
+    height: Kirigami.Units.gridUnit * 5 + 88
     Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-    Layout.minimumHeight: Kirigami.Units.gridUnit * 5
+    Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + 88
     Plasmoid.backgroundHints: resolvedBackgroundHints
     opacity: configuredOpacity / 100
 
@@ -86,7 +87,7 @@ PlasmoidItem {
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 5
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + 88
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
@@ -116,7 +117,7 @@ PlasmoidItem {
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 5
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + 88
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
@@ -141,5 +142,4 @@ PlasmoidItem {
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
     }
-
 }

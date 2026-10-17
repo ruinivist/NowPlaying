@@ -37,7 +37,8 @@ MouseArea {
     readonly property int availableContentWidth: Math.max(0, width - contentInset * 2)
     readonly property int separatorReservedWidth: nowPlayingLabelsVisible && !hideNowPlayingArea ? 1 + effectiveSeparatorGapLabel + effectiveSeparatorGapTrack : 0
     readonly property int maxLabelRailSize: Math.max(0, availableContentWidth - separatorReservedWidth)
-    readonly property int labelRailSize: Math.max(0, Math.min(height - contentInset * 2, maxLabelRailSize))
+    // Keep artwork and labels sized to the track row instead of the taller widget.
+    readonly property int labelRailSize: Math.max(0, Math.min(trackRow.height, maxLabelRailSize))
     readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && nowPlayingLabelsVisible && !hideNowPlayingArea
     readonly property int artworkControlsGap: configuredUseLabelArtwork && player.artUrl.length > 0 ? 2 : 0
     readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1
@@ -140,8 +141,13 @@ MouseArea {
     }
 
     RowLayout {
-        anchors.fill: parent
-        anchors.margins: mediaControlsMouseArea.contentInset
+        id: trackRow
+
+        x: mediaControlsMouseArea.contentInset
+        y: mediaControlsMouseArea.contentInset
+        width: mediaControlsMouseArea.availableContentWidth
+        // Reserve the bar height and gap so the track row cannot overlap the visualizer.
+        height: Math.max(0, mediaControlsMouseArea.height - mediaControlsMouseArea.contentInset * 2 - visualizer.implicitHeight - 16)
         layoutDirection: mediaControlsMouseArea.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
         Item {
@@ -305,5 +311,14 @@ MouseArea {
                 horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
         }
+    }
+
+    Visualizer {
+        id: visualizer
+
+        x: mediaControlsMouseArea.contentInset
+        y: trackRow.y + trackRow.height + 16
+        width: mediaControlsMouseArea.availableContentWidth
+        height: Math.min(implicitHeight, Math.max(0, mediaControlsMouseArea.height - y - mediaControlsMouseArea.contentInset))
     }
 }

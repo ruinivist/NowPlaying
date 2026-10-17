@@ -59,6 +59,12 @@ PlasmoidItem {
     // qmllint disable missing-property
     property bool configuredHideSeparator: plasmoid.configuration.hideSeparator
     // qmllint disable missing-property
+    property bool configuredVisualizerEnabled: plasmoid.configuration.visualizerEnabled
+    // qmllint disable missing-property
+    property string configuredVisualizerColorMode: plasmoid.configuration.visualizerColorMode
+    // qmllint disable missing-property
+    property string configuredVisualizerColor: plasmoid.configuration.visualizerColor
+    // qmllint disable missing-property
     property int configuredVisualizerBarHeight: plasmoid.configuration.visualizerBarHeight
     // qmllint disable missing-property
     property int configuredVisualizerBarCount: plasmoid.configuration.visualizerBarCount
@@ -67,6 +73,7 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredVisualizerScale: plasmoid.configuration.visualizerScale
     readonly property int visualizerHeight: Math.max(1, Math.min(512, configuredVisualizerBarHeight))
+    readonly property int visualizerReservedHeight: configuredVisualizerEnabled ? visualizerHeight + 16 : 0
     readonly property int resolvedBackgroundHints: {
         if (configuredBackgroundStyle === "default")
             return PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground;
@@ -79,9 +86,9 @@ PlasmoidItem {
 
     width: Kirigami.Units.gridUnit * 25
     // Reserve the configured bars and gap without shrinking the original track row.
-    height: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
+    height: Kirigami.Units.gridUnit * 5 + root.visualizerReservedHeight
     Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-    Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
+    Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerReservedHeight
     Plasmoid.backgroundHints: resolvedBackgroundHints
     opacity: configuredOpacity / 100
 
@@ -96,7 +103,7 @@ PlasmoidItem {
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerReservedHeight
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
@@ -120,6 +127,9 @@ PlasmoidItem {
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
+        configuredVisualizerEnabled: root.configuredVisualizerEnabled
+        configuredVisualizerColorMode: root.configuredVisualizerColorMode
+        configuredVisualizerColor: root.configuredVisualizerColor
         configuredVisualizerBarHeight: root.visualizerHeight
         configuredVisualizerBarCount: root.configuredVisualizerBarCount
         configuredVisualizerSmoothing: root.configuredVisualizerSmoothing
@@ -130,7 +140,7 @@ PlasmoidItem {
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerHeight + 16
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerReservedHeight
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
@@ -154,6 +164,9 @@ PlasmoidItem {
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
+        configuredVisualizerEnabled: root.configuredVisualizerEnabled
+        configuredVisualizerColorMode: root.configuredVisualizerColorMode
+        configuredVisualizerColor: root.configuredVisualizerColor
         configuredVisualizerBarHeight: root.visualizerHeight
         configuredVisualizerBarCount: root.configuredVisualizerBarCount
         configuredVisualizerSmoothing: root.configuredVisualizerSmoothing

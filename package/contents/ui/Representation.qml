@@ -27,6 +27,9 @@ MouseArea {
     property int configuredSeparatorGapTrack: 4
     property int configuredSeparatorHeight: 90
     property bool configuredHideSeparator: false
+    property bool configuredVisualizerEnabled: true
+    property string configuredVisualizerColorMode: "foreground"
+    property string configuredVisualizerColor: "white"
     property int configuredVisualizerBarHeight: 100
     property int configuredVisualizerBarCount: 100
     property int configuredVisualizerSmoothing: 10
@@ -150,8 +153,8 @@ MouseArea {
         x: mediaControlsMouseArea.contentInset
         y: mediaControlsMouseArea.contentInset
         width: mediaControlsMouseArea.availableContentWidth
-        // Reserve the bar height and gap so the track row cannot overlap the visualizer.
-        height: Math.max(0, mediaControlsMouseArea.height - mediaControlsMouseArea.contentInset * 2 - visualizer.implicitHeight - 16)
+        // Reserve the bar height and gap only while the visualizer is enabled.
+        height: Math.max(0, mediaControlsMouseArea.height - mediaControlsMouseArea.contentInset * 2 - (mediaControlsMouseArea.configuredVisualizerEnabled ? visualizer.implicitHeight + 16 : 0))
         layoutDirection: mediaControlsMouseArea.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
         Item {
@@ -320,6 +323,8 @@ MouseArea {
     Visualizer {
         id: visualizer
 
+        visible: mediaControlsMouseArea.configuredVisualizerEnabled
+        barColor: mediaControlsMouseArea.configuredVisualizerColorMode === "custom" ? (mediaControlsMouseArea.configuredVisualizerColor || "white") : mediaControlsMouseArea.effectiveForegroundColor
         barHeight: mediaControlsMouseArea.configuredVisualizerBarHeight
         barCount: mediaControlsMouseArea.configuredVisualizerBarCount
         smoothing: mediaControlsMouseArea.configuredVisualizerSmoothing

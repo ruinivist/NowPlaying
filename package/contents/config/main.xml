@@ -102,6 +102,18 @@ PLAYING]]></default>
             <label>Hide separator</label>
             <default>false</default>
         </entry>
+        <entry name="visualizerEnabled" type="Bool">
+            <label>Enable visualiser</label>
+            <default>true</default>
+        </entry>
+        <entry name="visualizerColorMode" type="String">
+            <label>Visualiser color mode</label>
+            <default>foreground</default>
+        </entry>
+        <entry name="visualizerColor" type="String">
+            <label>Visualiser color</label>
+            <default>white</default>
+        </entry>
         <entry name="visualizerBarHeight" type="Int">
             <label>Visualiser bar height</label>
             <default>100</default>

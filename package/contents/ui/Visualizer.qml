@@ -1,4 +1,4 @@
-// Renders configured CAVA levels as downward white bars.
+// Renders configured CAVA levels as downward colored bars.
 // Used beneath the track row in each widget representation.
 pragma ComponentBehavior: Bound
 
@@ -14,6 +14,7 @@ Item {
     property int barCount: 100
     property int smoothing: 10
     property string scaleMode: "linear"
+    property color barColor: "white"
     readonly property var levels: cava.levels
 
     implicitHeight: Math.max(1, Math.min(512, barHeight))
@@ -44,7 +45,7 @@ Item {
             y: 0
             width: Math.round((index + 0.5) * pitch) - x
             height: Math.min(Math.max(0, visualizer.height), Math.max(1, Math.round(visualizer.height * scaledLevel)))
-            color: "white"
+            color: visualizer.barColor
         }
     }
 }

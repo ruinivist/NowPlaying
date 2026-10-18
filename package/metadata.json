@@ -11,7 +11,7 @@
         "Id": "org.ruiny.NowPlaying",
         "License": "GPLv3",
         "Name": "NowPlaying",
-        "Version": "1.0",
+        "Version": "1.5",
         "Website": "https://github.com/ruinivist/NowPlaying"
     },
     "KPackageStructure": "Plasma/Applet",

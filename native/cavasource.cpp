@@ -38,7 +38,9 @@ bool CavaFrames::append(const QByteArray &bytes) {
 
 // ---------- Process lifecycle ----------
 
-CavaSource::CavaSource(QObject *parent) : QObject(parent) {
+CavaSource::CavaSource(QObject *parent)
+    : QObject(parent),
+      m_executable(QStandardPaths::findExecutable(QStringLiteral("cava"))) {
   m_reconfigureTimer.setSingleShot(true);
   m_reconfigureTimer.setInterval(0);
   // Settings applied together need only one capture restart.
@@ -135,15 +137,13 @@ void CavaSource::start() {
   m_error.clear();
   m_stderr.clear();
   Q_EMIT errorChanged();
-  const QString executable =
-      QStandardPaths::findExecutable(QStringLiteral("cava"));
-  if (executable.isEmpty()) {
+  if (!available()) {
     fail(QStringLiteral("CAVA is not installed or is not on PATH."));
     return;
   }
   if (!prepareConfig())
     return;
-  m_process.start(executable, {QStringLiteral("-p"), m_config.fileName()});
+  m_process.start(m_executable, {QStringLiteral("-p"), m_config.fileName()});
 }
 
 // ---------- Private capture configuration ----------

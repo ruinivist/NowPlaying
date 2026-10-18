@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasmoid
+import "NowPlaying/Native" as Native
 
 PlasmoidItem {
     id: root
@@ -60,6 +61,7 @@ PlasmoidItem {
     property bool configuredHideSeparator: plasmoid.configuration.hideSeparator
     // qmllint disable missing-property
     property bool configuredVisualizerEnabled: plasmoid.configuration.visualizerEnabled
+    readonly property bool visualizerEnabled: configuredVisualizerEnabled && cavaAvailability.available
     // qmllint disable missing-property
     property string configuredVisualizerColorMode: plasmoid.configuration.visualizerColorMode
     // qmllint disable missing-property
@@ -73,7 +75,7 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredVisualizerScale: plasmoid.configuration.visualizerScale
     readonly property int visualizerHeight: Math.max(1, Math.min(512, configuredVisualizerBarHeight))
-    readonly property int visualizerReservedHeight: configuredVisualizerEnabled ? visualizerHeight + 16 : 0
+    readonly property int visualizerReservedHeight: visualizerEnabled ? visualizerHeight + 16 : 0
     readonly property int resolvedBackgroundHints: {
         if (configuredBackgroundStyle === "default")
             return PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground;
@@ -91,6 +93,10 @@ PlasmoidItem {
     Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerReservedHeight
     Plasmoid.backgroundHints: resolvedBackgroundHints
     opacity: configuredOpacity / 100
+
+    Native.CavaSource {
+        id: cavaAvailability
+    }
 
     Player {
         id: player
@@ -127,7 +133,7 @@ PlasmoidItem {
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
-        configuredVisualizerEnabled: root.configuredVisualizerEnabled
+        configuredVisualizerEnabled: root.visualizerEnabled
         configuredVisualizerColorMode: root.configuredVisualizerColorMode
         configuredVisualizerColor: root.configuredVisualizerColor
         configuredVisualizerBarHeight: root.visualizerHeight
@@ -164,7 +170,7 @@ PlasmoidItem {
         configuredSeparatorGapTrack: root.configuredSeparatorGapTrack
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
-        configuredVisualizerEnabled: root.configuredVisualizerEnabled
+        configuredVisualizerEnabled: root.visualizerEnabled
         configuredVisualizerColorMode: root.configuredVisualizerColorMode
         configuredVisualizerColor: root.configuredVisualizerColor
         configuredVisualizerBarHeight: root.visualizerHeight

@@ -6,6 +6,7 @@ import QtQuick.Dialogs as Dialogs
 import QtQuick.Layouts
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
+import "NowPlaying/Native" as Native
 
 KCM.SimpleKCM {
     id: configRoot
@@ -19,21 +20,34 @@ KCM.SimpleKCM {
     property alias cfg_visualizerBarCount: barCount.value
     property alias cfg_visualizerSmoothing: smoothing.value
     property string cfg_visualizerScale
+    readonly property bool controlsEnabled: cavaAvailability.available && cfg_visualizerEnabled
+
+    Native.CavaSource {
+        id: cavaAvailability
+    }
 
     // ---------- Settings form ----------
 
     Kirigami.FormLayout {
+        Kirigami.InlineMessage {
+            Layout.fillWidth: true
+            visible: !cavaAvailability.available
+            type: Kirigami.MessageType.Warning
+            text: i18n("CAVA was not found. Install CAVA and reload the widget to enable the visualiser.")
+        }
+
         QQC2.CheckBox {
             id: enabledCheckBox
 
             text: i18n("Enabled")
+            enabled: cavaAvailability.available
         }
 
         QQC2.SpinBox {
             id: barHeight
 
             Kirigami.FormData.label: i18n("Bar height (px):")
-            enabled: configRoot.cfg_visualizerEnabled
+            enabled: configRoot.controlsEnabled
             from: 1
             to: 512
             editable: true
@@ -43,7 +57,7 @@ KCM.SimpleKCM {
             id: barCount
 
             Kirigami.FormData.label: i18n("Number of bars:")
-            enabled: configRoot.cfg_visualizerEnabled
+            enabled: configRoot.controlsEnabled
             from: 1
             to: 512
             editable: true
@@ -53,7 +67,7 @@ KCM.SimpleKCM {
             id: smoothing
 
             Kirigami.FormData.label: i18n("Smoothing (0 = least, 100 = most):")
-            enabled: configRoot.cfg_visualizerEnabled
+            enabled: configRoot.controlsEnabled
             from: 0
             to: 100
             editable: true
@@ -61,7 +75,7 @@ KCM.SimpleKCM {
 
         QQC2.ComboBox {
             Kirigami.FormData.label: i18n("Scale:")
-            enabled: configRoot.cfg_visualizerEnabled
+            enabled: configRoot.controlsEnabled
             model: [i18n("Square root (boosts quieter bars)"), i18n("Linear")]
             currentIndex: configRoot.cfg_visualizerScale === "linear" ? 1 : 0
             onActivated: configRoot.cfg_visualizerScale = currentIndex === 1 ? "linear" : "sqrt"
@@ -69,7 +83,7 @@ KCM.SimpleKCM {
 
         QQC2.ComboBox {
             Kirigami.FormData.label: i18n("Color:")
-            enabled: configRoot.cfg_visualizerEnabled
+            enabled: configRoot.controlsEnabled
             model: [i18n("Foreground"), i18n("Custom")]
             currentIndex: configRoot.cfg_visualizerColorMode === "custom" ? 1 : 0
             onActivated: configRoot.cfg_visualizerColorMode = currentIndex === 1 ? "custom" : "foreground"
@@ -77,7 +91,7 @@ KCM.SimpleKCM {
 
         RowLayout {
             Kirigami.FormData.label: i18n("Visualiser color:")
-            enabled: configRoot.cfg_visualizerEnabled
+            enabled: configRoot.controlsEnabled
             visible: configRoot.cfg_visualizerColorMode === "custom"
 
             QQC2.TextField {

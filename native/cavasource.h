@@ -34,6 +34,7 @@ public:
 class CavaSource : public QObject {
   Q_OBJECT
   QML_ELEMENT
+  Q_PROPERTY(bool available READ available CONSTANT)
   Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
   Q_PROPERTY(
       int barCount READ barCount WRITE setBarCount NOTIFY barCountChanged)
@@ -46,6 +47,7 @@ public:
   explicit CavaSource(QObject *parent = nullptr);
   ~CavaSource() override;
 
+  bool available() const { return !m_executable.isEmpty(); }
   int barCount() const { return m_barCount; }
   void setBarCount(int barCount);
   int smoothing() const { return m_smoothing; }
@@ -84,6 +86,7 @@ private:
 
   // ---------- Owned resources ----------
 
+  const QString m_executable;
   CavaFrames m_frames;
   QProcess m_process;
   QTemporaryFile m_config;

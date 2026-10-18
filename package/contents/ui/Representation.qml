@@ -323,7 +323,7 @@ MouseArea {
 
         x: mediaControlsMouseArea.contentInset
         y: trackRow.y + trackRow.height + 16
-        width: mediaControlsMouseArea.availableContentWidth
-        height: Math.min(implicitHeight, Math.max(0, mediaControlsMouseArea.height - y - mediaControlsMouseArea.contentInset))
+        width: visible ? mediaControlsMouseArea.availableContentWidth : 0
+        height: visible ? Math.min(implicitHeight, Math.max(0, mediaControlsMouseArea.height - y - mediaControlsMouseArea.contentInset)) : 0
     }
 }

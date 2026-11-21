@@ -3,8 +3,8 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
-MouseArea {
-    id: mediaControlsMouseArea
+Item {
+    id: root
 
     property string configuredFontFamily: "Noto Sans"
     property int configuredLabelFontSize: 16
@@ -78,10 +78,8 @@ MouseArea {
 
     visible: hasTrackInfo || effectiveLabelVisibilityMode === "always"
     focus: true
-    acceptedButtons: Qt.NoButton
-    hoverEnabled: true
     onRawHoverActiveChanged: {
-        if (!mediaControlsMouseArea.mediaControlsEnabled) {
+        if (!root.mediaControlsEnabled) {
             hoverExitTimer.stop();
             return;
         }
@@ -91,11 +89,11 @@ MouseArea {
             hoverExitTimer.restart();
     }
     onMediaControlsEnabledChanged: {
-        if (!mediaControlsMouseArea.mediaControlsEnabled)
+        if (!root.mediaControlsEnabled)
             hoverExitTimer.stop();
     }
     Keys.onPressed: event => {
-        if (!mediaControlsMouseArea.mediaControlsEnabled) {
+        if (!root.mediaControlsEnabled) {
             event.accepted = false;
             return;
         }
@@ -115,7 +113,7 @@ MouseArea {
     HoverHandler {
         id: rootHoverHandler
 
-        enabled: mediaControlsMouseArea.mediaControlsEnabled
+        enabled: root.mediaControlsEnabled
         margin: 60
     }
 
@@ -134,76 +132,76 @@ MouseArea {
 
     Rectangle {
         anchors.fill: parent
-        visible: mediaControlsMouseArea.usesCustomBackground
-        color: mediaControlsMouseArea.effectiveBackgroundColor
-        radius: mediaControlsMouseArea.effectiveBackgroundRadius
+        visible: root.usesCustomBackground
+        color: root.effectiveBackgroundColor
+        radius: root.effectiveBackgroundRadius
     }
 
     RowLayout {
         id: trackRow
 
-        x: mediaControlsMouseArea.contentInset
-        y: mediaControlsMouseArea.contentInset
-        width: mediaControlsMouseArea.availableContentWidth
+        x: root.contentInset
+        y: root.contentInset
+        width: root.availableContentWidth
         // Reserve the bar height and gap only while the visualizer is enabled.
-        height: Math.max(0, mediaControlsMouseArea.height - mediaControlsMouseArea.contentInset * 2 - (mediaControlsMouseArea.configuredVisualizerEnabled ? visualizer.implicitHeight + 16 : 0))
-        layoutDirection: mediaControlsMouseArea.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
+        height: Math.max(0, root.height - root.contentInset * 2 - (root.configuredVisualizerEnabled ? visualizer.implicitHeight + 16 : 0))
+        layoutDirection: root.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
         Item {
             id: leftColumn
 
-            visible: !mediaControlsMouseArea.hideNowPlayingArea
+            visible: !root.hideNowPlayingArea
             Layout.fillHeight: true
-            Layout.minimumWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
-            Layout.preferredWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
-            Layout.maximumWidth: visible ? mediaControlsMouseArea.labelRailSize : 0
+            Layout.minimumWidth: visible ? root.labelRailSize : 0
+            Layout.preferredWidth: visible ? root.labelRailSize : 0
+            Layout.maximumWidth: visible ? root.labelRailSize : 0
 
             Item {
                 id: labelSlot
 
-                readonly property bool showsArtwork: mediaControlsMouseArea.configuredUseLabelArtwork && player.artUrl.length > 0
+                readonly property bool showsArtwork: root.configuredUseLabelArtwork && player.artUrl.length > 0
                 // Text is rasterized at whole pixel sizes, then lightly scaled between steps for smoother motion.
-                readonly property real textTargetFontSize: Math.max(1, mediaControlsMouseArea.effectiveLabelFontSize * mediaControlsMouseArea.labelContentScale)
+                readonly property real textTargetFontSize: Math.max(1, root.effectiveLabelFontSize * root.labelContentScale)
                 readonly property int textRasterFontSize: Math.max(1, Math.round(textTargetFontSize))
                 readonly property real textResidualScale: textTargetFontSize / textRasterFontSize
 
-                x: mediaControlsMouseArea.labelsOnRight ? 0 : leftColumn.width - width
+                x: root.labelsOnRight ? 0 : leftColumn.width - width
                 y: 0
-                width: mediaControlsMouseArea.labelContentSize
-                height: mediaControlsMouseArea.labelContentSize
+                width: root.labelContentSize
+                height: root.labelContentSize
                 clip: true
 
                 LabelContent {
                     anchors.left: parent.left
                     anchors.top: parent.top
-                    width: labelSlot.showsArtwork ? mediaControlsMouseArea.labelRailSize : mediaControlsMouseArea.labelContentSize / labelSlot.textResidualScale
-                    height: labelSlot.showsArtwork ? mediaControlsMouseArea.labelRailSize : mediaControlsMouseArea.labelContentSize / labelSlot.textResidualScale
-                    scale: labelSlot.showsArtwork ? mediaControlsMouseArea.labelContentScale : labelSlot.textResidualScale
+                    width: labelSlot.showsArtwork ? root.labelRailSize : root.labelContentSize / labelSlot.textResidualScale
+                    height: labelSlot.showsArtwork ? root.labelRailSize : root.labelContentSize / labelSlot.textResidualScale
+                    scale: labelSlot.showsArtwork ? root.labelContentScale : labelSlot.textResidualScale
                     transformOrigin: Item.TopLeft
-                    artworkSource: mediaControlsMouseArea.configuredUseLabelArtwork ? player.artUrl : ""
-                    labelLines: mediaControlsMouseArea.effectiveLabelLines
-                    fontFamily: mediaControlsMouseArea.configuredFontFamily
-                    fontPixelSize: labelSlot.showsArtwork ? mediaControlsMouseArea.effectiveLabelFontSize : labelSlot.textRasterFontSize
-                    textColor: mediaControlsMouseArea.effectiveForegroundColor
-                    textShadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
-                    verticalSpacing: mediaControlsMouseArea.effectiveLabelVerticalSpacing
-                    horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignLeft : Text.AlignRight
-                    borderRadius: mediaControlsMouseArea.effectiveImageBorderRadius
-                    artworkSize: labelSlot.showsArtwork ? mediaControlsMouseArea.labelRailSize : mediaControlsMouseArea.labelContentSize / labelSlot.textResidualScale
+                    artworkSource: root.configuredUseLabelArtwork ? player.artUrl : ""
+                    labelLines: root.effectiveLabelLines
+                    fontFamily: root.configuredFontFamily
+                    fontPixelSize: labelSlot.showsArtwork ? root.effectiveLabelFontSize : labelSlot.textRasterFontSize
+                    textColor: root.effectiveForegroundColor
+                    textShadowEnabled: root.configuredTextShadowEnabled
+                    verticalSpacing: root.effectiveLabelVerticalSpacing
+                    horizontalAlignment: root.labelsOnRight ? Text.AlignLeft : Text.AlignRight
+                    borderRadius: root.effectiveImageBorderRadius
+                    artworkSize: labelSlot.showsArtwork ? root.labelRailSize : root.labelContentSize / labelSlot.textResidualScale
                 }
             }
 
             RowLayout {
                 id: mediaControls
 
-                x: mediaControlsMouseArea.labelsOnRight ? 0 : leftColumn.width - width
-                y: mediaControlsMouseArea.labelContentSize + mediaControlsMouseArea.artworkControlsGap
+                x: root.labelsOnRight ? 0 : leftColumn.width - width
+                y: root.labelContentSize + root.artworkControlsGap
                 width: implicitWidth
-                height: mediaControlsMouseArea.buttonSize
+                height: root.buttonSize
                 clip: true
-                enabled: mediaControlsMouseArea.mediaControlsTargetShown
-                opacity: mediaControlsMouseArea.controlsReveal
-                visible: mediaControlsMouseArea.mediaControlsTargetShown || opacity > 0
+                enabled: root.mediaControlsTargetShown
+                opacity: root.controlsReveal
+                visible: root.mediaControlsTargetShown || opacity > 0
 
                 QQC2.Button {
                     Layout.preferredWidth: buttonSize
@@ -217,7 +215,7 @@ MouseArea {
 
                     contentItem: Kirigami.Icon {
                         source: "media-skip-backward"
-                        color: mediaControlsMouseArea.effectiveForegroundColor
+                        color: root.effectiveForegroundColor
                     }
                 }
 
@@ -235,7 +233,7 @@ MouseArea {
 
                     contentItem: Kirigami.Icon {
                         source: player.playbackStatus === 2 ? "media-playback-pause" : "media-playback-start"
-                        color: mediaControlsMouseArea.effectiveForegroundColor
+                        color: root.effectiveForegroundColor
                     }
                 }
 
@@ -248,7 +246,7 @@ MouseArea {
 
                     contentItem: Kirigami.Icon {
                         source: "media-skip-forward"
-                        color: mediaControlsMouseArea.effectiveForegroundColor
+                        color: root.effectiveForegroundColor
                     }
                 }
             }
@@ -257,10 +255,10 @@ MouseArea {
         Item {
             id: separatorContainer
 
-            visible: !mediaControlsMouseArea.hideNowPlayingArea
+            visible: !root.hideNowPlayingArea
             Layout.fillHeight: true
-            Layout.leftMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapLabel : 0
-            Layout.rightMargin: visible ? mediaControlsMouseArea.effectiveSeparatorGapTrack : 0
+            Layout.leftMargin: visible ? root.effectiveSeparatorGapLabel : 0
+            Layout.rightMargin: visible ? root.effectiveSeparatorGapTrack : 0
             Layout.minimumWidth: visible ? 1 : 0
             Layout.preferredWidth: visible ? 1 : 0
             Layout.maximumWidth: visible ? 1 : 0
@@ -269,8 +267,8 @@ MouseArea {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 width: 1
-                height: Math.round(parent.height * mediaControlsMouseArea.effectiveSeparatorHeight / 100)
-                color: mediaControlsMouseArea.configuredHideSeparator ? "transparent" : mediaControlsMouseArea.effectiveForegroundColor
+                height: Math.round(parent.height * root.effectiveSeparatorHeight / 100)
+                color: root.configuredHideSeparator ? "transparent" : root.effectiveForegroundColor
             }
         }
 
@@ -279,34 +277,34 @@ MouseArea {
 
             Layout.fillWidth: true
             Layout.minimumWidth: 0
-            Layout.leftMargin: mediaControlsMouseArea.hideNowPlayingArea ? mediaControlsMouseArea.hideModeHorizontalPadding : 0
-            Layout.rightMargin: mediaControlsMouseArea.hideNowPlayingArea ? mediaControlsMouseArea.hideModeHorizontalPadding : 0
-            spacing: mediaControlsMouseArea.effectiveTrackTextVerticalSpacing
+            Layout.leftMargin: root.hideNowPlayingArea ? root.hideModeHorizontalPadding : 0
+            Layout.rightMargin: root.hideNowPlayingArea ? root.hideModeHorizontalPadding : 0
+            spacing: root.effectiveTrackTextVerticalSpacing
 
             ShadowedLabel {
                 Layout.fillWidth: true
-                shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
+                shadowEnabled: root.configuredTextShadowEnabled
                 text: player.title
-                font.pixelSize: mediaControlsMouseArea.effectiveTitleFontSize
+                font.pixelSize: root.effectiveTitleFontSize
                 font.bold: true
-                font.family: mediaControlsMouseArea.configuredFontFamily
-                color: mediaControlsMouseArea.effectiveForegroundColor
+                font.family: root.configuredFontFamily
+                color: root.effectiveForegroundColor
                 lineHeight: 0.8
                 elide: Text.ElideRight
-                horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
+                horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
 
             ShadowedLabel {
                 Layout.fillWidth: true
-                Layout.alignment: mediaControlsMouseArea.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
-                shadowEnabled: mediaControlsMouseArea.configuredTextShadowEnabled
+                Layout.alignment: root.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
+                shadowEnabled: root.configuredTextShadowEnabled
                 text: player.artists
-                font.pixelSize: mediaControlsMouseArea.effectiveArtistFontSize
-                font.family: mediaControlsMouseArea.configuredFontFamily
-                color: mediaControlsMouseArea.effectiveForegroundColor
+                font.pixelSize: root.effectiveArtistFontSize
+                font.family: root.configuredFontFamily
+                color: root.effectiveForegroundColor
                 lineHeight: 0.8
                 elide: Text.ElideRight
-                horizontalAlignment: mediaControlsMouseArea.labelsOnRight ? Text.AlignRight : Text.AlignLeft
+                horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
             }
         }
     }
@@ -314,16 +312,16 @@ MouseArea {
     Visualizer {
         id: visualizer
 
-        visible: mediaControlsMouseArea.configuredVisualizerEnabled
-        barColor: mediaControlsMouseArea.configuredVisualizerColorMode === "custom" ? (mediaControlsMouseArea.configuredVisualizerColor || "white") : mediaControlsMouseArea.effectiveForegroundColor
-        barHeight: mediaControlsMouseArea.configuredVisualizerBarHeight
-        barCount: mediaControlsMouseArea.configuredVisualizerBarCount
-        smoothing: mediaControlsMouseArea.configuredVisualizerSmoothing
-        scaleMode: mediaControlsMouseArea.configuredVisualizerScale
+        visible: root.configuredVisualizerEnabled
+        barColor: root.configuredVisualizerColorMode === "custom" ? (root.configuredVisualizerColor || "white") : root.effectiveForegroundColor
+        barHeight: root.configuredVisualizerBarHeight
+        barCount: root.configuredVisualizerBarCount
+        smoothing: root.configuredVisualizerSmoothing
+        scaleMode: root.configuredVisualizerScale
 
-        x: mediaControlsMouseArea.contentInset
+        x: root.contentInset
         y: trackRow.y + trackRow.height + 16
-        width: visible ? mediaControlsMouseArea.availableContentWidth : 0
-        height: visible ? Math.min(implicitHeight, Math.max(0, mediaControlsMouseArea.height - y - mediaControlsMouseArea.contentInset)) : 0
+        width: visible ? root.availableContentWidth : 0
+        height: visible ? Math.min(implicitHeight, Math.max(0, root.height - y - root.contentInset)) : 0
     }
 }

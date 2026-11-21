@@ -25,6 +25,7 @@ KCM.SimpleKCM {
     property alias cfg_foregroundColor: foregroundColorField.text
     property alias cfg_textShadowEnabled: textShadowCheckBox.checked
     property alias cfg_showMediaControls: showMediaControlsCheckBox.checked
+    property string cfg_seekBarMode
     property alias cfg_sourcePriority: sourcePriorityField.text
     property alias cfg_sourceWhitelist: sourceWhitelistCheckBox.checked
     property alias cfg_trackTextVerticalSpacing: trackTextVerticalSpacingSpinBox.value
@@ -59,6 +60,16 @@ KCM.SimpleKCM {
     }, {
         "text": i18n("Solid background"),
         "value": "default"
+    }]
+    readonly property var seekBarModeOptions: [{
+        "text": i18n("On hover"),
+        "value": "hover"
+    }, {
+        "text": i18n("Always show"),
+        "value": "always"
+    }, {
+        "text": i18n("Always hide"),
+        "value": "hidden"
     }]
     readonly property bool hasSourcePriorityEntries: sourcePriorityField.text.split(",").some((entry) => {
         return normalizeDesktopEntry(entry).length > 0;
@@ -124,6 +135,12 @@ KCM.SimpleKCM {
         const resolvedValue = syncComboByValue(backgroundStyleComboBox, backgroundStyleOptions, cfg_backgroundStyle, "custom");
         if (cfg_backgroundStyle !== resolvedValue)
             cfg_backgroundStyle = resolvedValue;
+
+    }
+    onCfg_seekBarModeChanged: {
+        const resolvedValue = syncComboByValue(seekBarModeComboBox, seekBarModeOptions, cfg_seekBarMode, "hover");
+        if (cfg_seekBarMode !== resolvedValue)
+            cfg_seekBarMode = resolvedValue;
 
     }
 
@@ -220,6 +237,16 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Media controls:")
             text: i18n("Show media controls")
+        }
+
+        QQC2.ComboBox {
+            id: seekBarModeComboBox
+
+            Kirigami.FormData.label: i18n("Seek bar:")
+            model: configRoot.seekBarModeOptions
+            textRole: "text"
+            valueRole: "value"
+            onActivated: configRoot.cfg_seekBarMode = currentValue
         }
 
         QQC2.TextField {

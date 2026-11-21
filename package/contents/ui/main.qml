@@ -44,6 +44,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property bool configuredShowMediaControls: plasmoid.configuration.showMediaControls
     // qmllint disable missing-property
+    property string configuredSeekBarMode: plasmoid.configuration.seekBarMode
+    // qmllint disable missing-property
     property string configuredSourcePriority: plasmoid.configuration.sourcePriority
     // qmllint disable missing-property
     property bool configuredSourceWhitelist: plasmoid.configuration.sourceWhitelist
@@ -75,7 +77,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredVisualizerScale: plasmoid.configuration.visualizerScale
     readonly property int visualizerHeight: Math.max(1, Math.min(512, configuredVisualizerBarHeight))
-    readonly property int visualizerReservedHeight: visualizerEnabled ? visualizerHeight + 16 : 0
+    readonly property int visualizerGap: 8
+    readonly property int visualizerReservedHeight: visualizerEnabled ? visualizerHeight + visualizerGap : 0
     readonly property int resolvedBackgroundHints: {
         if (configuredBackgroundStyle === "default")
             return PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground;
@@ -99,13 +102,14 @@ PlasmoidItem {
     }
 
     Player {
-        id: player
+        id: mediaPlayer
 
         sourcePriority: root.configuredSourcePriority
         sourceWhitelist: root.configuredSourceWhitelist
     }
 
     fullRepresentation: Representation {
+        player: mediaPlayer
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
@@ -127,6 +131,7 @@ PlasmoidItem {
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
         configuredShowMediaControls: root.configuredShowMediaControls
+        configuredSeekBarMode: root.configuredSeekBarMode
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
@@ -134,6 +139,7 @@ PlasmoidItem {
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
         configuredVisualizerEnabled: root.visualizerEnabled
+        visualizerGap: root.visualizerGap
         configuredVisualizerColorMode: root.configuredVisualizerColorMode
         configuredVisualizerColor: root.configuredVisualizerColor
         configuredVisualizerBarHeight: root.visualizerHeight
@@ -143,6 +149,7 @@ PlasmoidItem {
     }
 
     compactRepresentation: Representation {
+        player: mediaPlayer
         width: root.width
         height: root.height
         Layout.minimumWidth: Kirigami.Units.gridUnit * 25
@@ -164,6 +171,7 @@ PlasmoidItem {
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
         configuredShowMediaControls: root.configuredShowMediaControls
+        configuredSeekBarMode: root.configuredSeekBarMode
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
@@ -171,6 +179,7 @@ PlasmoidItem {
         configuredSeparatorHeight: root.configuredSeparatorHeight
         configuredHideSeparator: root.configuredHideSeparator
         configuredVisualizerEnabled: root.visualizerEnabled
+        visualizerGap: root.visualizerGap
         configuredVisualizerColorMode: root.configuredVisualizerColorMode
         configuredVisualizerColor: root.configuredVisualizerColor
         configuredVisualizerBarHeight: root.visualizerHeight

@@ -70,6 +70,10 @@ PLAYING]]></default>
             <label>Show media controls</label>
             <default>true</default>
         </entry>
+        <entry name="seekBarMode" type="String">
+            <label>Seek bar mode</label>
+            <default>hover</default>
+        </entry>
         <entry name="sourcePriority" type="String">
             <label>Source priority</label>
             <default></default>

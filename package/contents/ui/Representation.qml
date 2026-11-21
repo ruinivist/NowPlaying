@@ -6,6 +6,7 @@ import org.kde.kirigami as Kirigami
 Item {
     id: root
 
+    required property var player
     property string configuredFontFamily: "Noto Sans"
     property int configuredLabelFontSize: 16
     property int configuredTitleFontSize: 28
@@ -21,6 +22,7 @@ Item {
     property string configuredForegroundColor: "white"
     property bool configuredTextShadowEnabled: false
     property bool configuredShowMediaControls: true
+    property string configuredSeekBarMode: "hover"
     property int configuredTrackTextVerticalSpacing: 5
     property int configuredLabelVerticalSpacing: 0
     property int configuredSeparatorGapLabel: 4
@@ -28,6 +30,7 @@ Item {
     property int configuredSeparatorHeight: 90
     property bool configuredHideSeparator: false
     property bool configuredVisualizerEnabled: true
+    required property int visualizerGap
     property string configuredVisualizerColorMode: "foreground"
     property string configuredVisualizerColor: "white"
     property int configuredVisualizerBarHeight: 100
@@ -47,7 +50,7 @@ Item {
     // Keep artwork and labels sized to the track row instead of the taller widget.
     readonly property int labelRailSize: Math.max(0, Math.min(trackRow.height, maxLabelRailSize))
     readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && !hideNowPlayingArea
-    readonly property int artworkControlsGap: configuredUseLabelArtwork && player.artUrl.length > 0 ? 2 : 0
+    readonly property int artworkControlsGap: configuredUseLabelArtwork && root.player.artUrl.length > 0 ? 2 : 0
     readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1
     property real labelContentScale: mediaControlsTargetShown ? labelShrunkScale : 1
     readonly property real controlsReveal: {
@@ -66,20 +69,83 @@ Item {
     readonly property int effectiveTitleFontSize: Math.max(1, configuredTitleFontSize)
     readonly property int effectiveArtistFontSize: Math.max(1, configuredArtistFontSize)
     readonly property int effectiveTrackTextVerticalSpacing: configuredTrackTextVerticalSpacing
+    readonly property int seekLineThickness: 4
     readonly property int effectiveLabelVerticalSpacing: configuredLabelVerticalSpacing
     readonly property int effectiveSeparatorGapLabel: Math.max(0, configuredSeparatorGapLabel)
     readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
     readonly property int effectiveSeparatorHeight: Math.max(0, Math.min(100, configuredSeparatorHeight))
     readonly property var effectiveLabelLines: (configuredLabelText || "").split(/\r?\n/)
     readonly property bool mediaControlsEnabled: configuredShowMediaControls
-    readonly property bool hasTrackInfo: player.ready && (((player.title || "").trim().length > 0) || ((player.artists || "").trim().length > 0))
-    readonly property bool rawHoverActive: mediaControlsEnabled && rootHoverHandler.hovered
+    readonly property string effectiveSeekBarMode: configuredSeekBarMode === "always" || configuredSeekBarMode === "hidden" ? configuredSeekBarMode : "hover"
+    readonly property bool hoverActivationEnabled: mediaControlsEnabled || effectiveSeekBarMode === "hover"
+    readonly property bool seekBarAvailable: effectiveSeekBarMode !== "hidden" && root.player.ready && root.player.canSeek && Number.isFinite(root.player.songLength) && root.player.songLength > 0
+    readonly property real seekDurationSeconds: seekBarAvailable ? root.player.songLength / 1000000 : 0
+    readonly property real seekPositionSeconds: seekBarAvailable && Number.isFinite(root.player.songPosition) ? Math.max(0, Math.min(seekDurationSeconds, root.player.songPosition / 1000000)) : 0
+    readonly property bool seekRevealTargetShown: seekBarAvailable && seekBarFits && (effectiveSeekBarMode === "always" || rawHoverActive || hoverExitTimer.running || seekSlider.activeFocus || seekSlider.pressed || seekHoverHandler.hovered)
+    readonly property bool positionRefreshActive: visible && seekRevealTargetShown
+    property real seekRevealProgress: seekRevealTargetShown ? 1 : 0
+    property var seekScrubSnapshot: null
+    property real seekScrubStartValue: 0
+    property bool seekPointerPending: false
+    readonly property bool hasTrackInfo: root.player.ready && (((root.player.title || "").trim().length > 0) || ((root.player.artists || "").trim().length > 0))
+    readonly property bool rawHoverActive: rootHoverHandler.hovered
     readonly property bool controlsHoverActive: mediaControlsEnabled && (rawHoverActive || hoverExitTimer.running)
+    readonly property real seekMinimumTextHeight: Math.ceil(minimumTitleFontMetrics.height) + Math.ceil(minimumArtistFontMetrics.height)
+    readonly property real seekBaseTextHeight: titleFontMetrics.height + artistFontMetrics.height
+    readonly property real seekLayoutSpacing: {
+        const spacing = root.effectiveTrackTextVerticalSpacing;
+        if (root.seekRevealProgress <= 0 || spacing <= 0)
+            return spacing;
+
+        const remaining = trackRow.height - root.seekMinimumTextHeight - root.seekRevealProgress * seekSlider.implicitHeight;
+        return Math.min(spacing, Math.max(0, remaining));
+    }
+    readonly property real seekTextFitScale: {
+        if (root.seekRevealProgress <= 0)
+            return 1;
+
+        const baseScale = 1 - 0.12 * root.seekRevealProgress;
+        const baseTextHeight = root.seekBaseTextHeight * baseScale;
+        const availableTextHeight = trackRow.height - root.seekLayoutSpacing - root.seekRevealProgress * seekSlider.implicitHeight;
+        return Math.min(1, Math.max(root.seekMinimumTextHeight / baseTextHeight, availableTextHeight / baseTextHeight));
+    }
+    readonly property bool seekBarFits: trackRow.height >= seekMinimumTextHeight + seekSlider.implicitHeight
+    readonly property real appliedSeekReveal: root.configuredVisualizerEnabled && seekBarRow.visible ? root.seekRevealProgress : 0
+
+    FontMetrics {
+        id: titleFontMetrics
+
+        font.family: root.configuredFontFamily
+        font.pixelSize: root.effectiveTitleFontSize
+        font.bold: true
+    }
+
+    FontMetrics {
+        id: artistFontMetrics
+
+        font.family: root.configuredFontFamily
+        font.pixelSize: root.effectiveArtistFontSize
+    }
+
+    FontMetrics {
+        id: minimumTitleFontMetrics
+
+        font.family: root.configuredFontFamily
+        font.pixelSize: Math.min(2, root.effectiveTitleFontSize)
+        font.bold: true
+    }
+
+    FontMetrics {
+        id: minimumArtistFontMetrics
+
+        font.family: root.configuredFontFamily
+        font.pixelSize: Math.min(2, root.effectiveArtistFontSize)
+    }
 
     visible: hasTrackInfo || effectiveLabelVisibilityMode === "always"
     focus: true
     onRawHoverActiveChanged: {
-        if (!root.mediaControlsEnabled) {
+        if (!root.hoverActivationEnabled) {
             hoverExitTimer.stop();
             return;
         }
@@ -89,8 +155,49 @@ Item {
             hoverExitTimer.restart();
     }
     onMediaControlsEnabledChanged: {
-        if (!root.mediaControlsEnabled)
+        if (!root.hoverActivationEnabled)
             hoverExitTimer.stop();
+    }
+    onEffectiveSeekBarModeChanged: {
+        if (!root.hoverActivationEnabled)
+            hoverExitTimer.stop();
+    }
+    onPositionRefreshActiveChanged: {
+        if (positionRefreshActive)
+            root.player.updatePosition();
+    }
+    function captureSeekSnapshot() {
+        return {
+            player: root.player.resolvedPlayer,
+            title: root.player.title,
+            artist: root.player.artists,
+            length: root.player.songLength,
+            artUrl: root.player.artUrl
+        };
+    }
+
+    function seekSnapshotMatches(snapshot) {
+        return snapshot && snapshot.player === root.player.resolvedPlayer && snapshot.title === root.player.title && snapshot.artist === root.player.artists && snapshot.length === root.player.songLength && snapshot.artUrl === root.player.artUrl;
+    }
+
+    function commitSeek(seconds, snapshot) {
+        if (!root.seekBarAvailable || !root.seekSnapshotMatches(snapshot))
+            return;
+
+        const duration = Math.round(root.player.songLength);
+        const position = Math.max(0, Math.min(duration, Math.round(Math.max(0, Math.min(seconds, root.seekDurationSeconds)) * 1000000)));
+        root.player.setPosition(position);
+        if (root.visible)
+            root.player.updatePosition();
+    }
+
+    function finishSeekPointerInteraction() {
+        if (!root.seekPointerPending)
+            return;
+        if (Math.abs(seekSlider.value - root.seekScrubStartValue) > 0.000001)
+            root.commitSeek(seekSlider.value, root.seekScrubSnapshot);
+        root.seekPointerPending = false;
+        root.seekScrubSnapshot = null;
     }
     Keys.onPressed: event => {
         if (!root.mediaControlsEnabled) {
@@ -100,11 +207,11 @@ Item {
         if (!event.modifiers) {
             event.accepted = true;
             if (event.key === Qt.Key_Space || event.key === Qt.Key_K)
-                player.togglePlayPause();
+                root.player.togglePlayPause();
             else if (event.key === Qt.Key_P)
-                player.previous();
+                root.player.previous();
             else if (event.key === Qt.Key_N)
-                player.next();
+                root.player.next();
             else
                 event.accepted = false;
         }
@@ -113,7 +220,7 @@ Item {
     HoverHandler {
         id: rootHoverHandler
 
-        enabled: root.mediaControlsEnabled
+        enabled: root.hoverActivationEnabled
         margin: 60
     }
 
@@ -130,6 +237,13 @@ Item {
         }
     }
 
+    Behavior on seekRevealProgress {
+        NumberAnimation {
+            duration: 250
+            easing.type: Easing.InOutQuad
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         visible: root.usesCustomBackground
@@ -140,11 +254,12 @@ Item {
     RowLayout {
         id: trackRow
 
+        objectName: "trackRow"
         x: root.contentInset
         y: root.contentInset
         width: root.availableContentWidth
         // Reserve the bar height and gap only while the visualizer is enabled.
-        height: Math.max(0, root.height - root.contentInset * 2 - (root.configuredVisualizerEnabled ? visualizer.implicitHeight + 16 : 0))
+        height: Math.max(0, root.height - root.contentInset * 2 - (root.configuredVisualizerEnabled ? visualizer.implicitHeight + root.visualizerGap : 0))
         layoutDirection: root.labelsOnRight ? Qt.RightToLeft : Qt.LeftToRight
 
         Item {
@@ -159,7 +274,7 @@ Item {
             Item {
                 id: labelSlot
 
-                readonly property bool showsArtwork: root.configuredUseLabelArtwork && player.artUrl.length > 0
+                readonly property bool showsArtwork: root.configuredUseLabelArtwork && root.player.artUrl.length > 0
                 // Text is rasterized at whole pixel sizes, then lightly scaled between steps for smoother motion.
                 readonly property real textTargetFontSize: Math.max(1, root.effectiveLabelFontSize * root.labelContentScale)
                 readonly property int textRasterFontSize: Math.max(1, Math.round(textTargetFontSize))
@@ -178,7 +293,7 @@ Item {
                     height: labelSlot.showsArtwork ? root.labelRailSize : root.labelContentSize / labelSlot.textResidualScale
                     scale: labelSlot.showsArtwork ? root.labelContentScale : labelSlot.textResidualScale
                     transformOrigin: Item.TopLeft
-                    artworkSource: root.configuredUseLabelArtwork ? player.artUrl : ""
+                    artworkSource: root.configuredUseLabelArtwork ? root.player.artUrl : ""
                     labelLines: root.effectiveLabelLines
                     fontFamily: root.configuredFontFamily
                     fontPixelSize: labelSlot.showsArtwork ? root.effectiveLabelFontSize : labelSlot.textRasterFontSize
@@ -209,7 +324,7 @@ Item {
                     padding: 0
                     background: null
                     onClicked: {
-                        player.previous();
+                        root.player.previous();
                         console.log("prev clicked");
                     }
 
@@ -227,12 +342,12 @@ Item {
                     padding: 0
                     background: null
                     onClicked: {
-                        player.togglePlayPause();
+                        root.player.togglePlayPause();
                         console.log("pause clicked");
                     }
 
                     contentItem: Kirigami.Icon {
-                        source: player.playbackStatus === 2 ? "media-playback-pause" : "media-playback-start"
+                        source: root.player.playbackStatus === 2 ? "media-playback-pause" : "media-playback-start"
                         color: root.effectiveForegroundColor
                     }
                 }
@@ -242,7 +357,7 @@ Item {
                     Layout.preferredHeight: buttonSize
                     padding: 0
                     background: null
-                    onClicked: player.next()
+                    onClicked: root.player.next()
 
                     contentItem: Kirigami.Icon {
                         source: "media-skip-forward"
@@ -272,39 +387,148 @@ Item {
             }
         }
 
-        ColumnLayout {
-            id: infoColumn
+        Item {
+            id: infoColumnWrapper
 
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.minimumWidth: 0
             Layout.leftMargin: root.hideNowPlayingArea ? root.hideModeHorizontalPadding : 0
             Layout.rightMargin: root.hideNowPlayingArea ? root.hideModeHorizontalPadding : 0
-            spacing: root.effectiveTrackTextVerticalSpacing
 
-            ShadowedLabel {
-                Layout.fillWidth: true
-                shadowEnabled: root.configuredTextShadowEnabled
-                text: player.title
-                font.pixelSize: root.effectiveTitleFontSize
-                font.bold: true
-                font.family: root.configuredFontFamily
-                color: root.effectiveForegroundColor
-                lineHeight: 0.8
-                elide: Text.ElideRight
-                horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
-            }
+            ColumnLayout {
+                id: infoColumn
 
-            ShadowedLabel {
-                Layout.fillWidth: true
-                Layout.alignment: root.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
-                shadowEnabled: root.configuredTextShadowEnabled
-                text: player.artists
-                font.pixelSize: root.effectiveArtistFontSize
-                font.family: root.configuredFontFamily
-                color: root.effectiveForegroundColor
-                lineHeight: 0.8
-                elide: Text.ElideRight
-                horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
+                objectName: "infoColumn"
+                x: 0
+                y: (parent.height - height) * (0.5 + root.appliedSeekReveal * 0.5)
+                width: parent.width
+                height: implicitHeight
+                spacing: 0
+
+                ShadowedLabel {
+                    objectName: "titleLabel"
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: root.seekLayoutSpacing
+                    shadowEnabled: root.configuredTextShadowEnabled
+                    text: root.player.title
+                    font.pixelSize: Math.max(1, Math.round(root.effectiveTitleFontSize * (1 - 0.12 * root.seekRevealProgress) * root.seekTextFitScale))
+                    font.bold: true
+                    font.family: root.configuredFontFamily
+                    color: root.effectiveForegroundColor
+                    lineHeight: 0.8
+                    elide: Text.ElideRight
+                    horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
+                }
+
+                ShadowedLabel {
+                    objectName: "artistLabel"
+                    Layout.fillWidth: true
+                    Layout.alignment: root.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
+                    shadowEnabled: root.configuredTextShadowEnabled
+                    text: root.player.artists
+                    font.pixelSize: Math.max(1, Math.round(root.effectiveArtistFontSize * (1 - 0.12 * root.seekRevealProgress) * root.seekTextFitScale))
+                    font.family: root.configuredFontFamily
+                    color: root.effectiveForegroundColor
+                    lineHeight: 0.8
+                    elide: Text.ElideRight
+                    horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
+                }
+
+                Item {
+                    id: seekBarRow
+
+                    objectName: "seekBarRow"
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 0
+                    Layout.preferredHeight: root.seekRevealProgress * seekSlider.implicitHeight
+                    Layout.maximumHeight: root.seekRevealProgress * seekSlider.implicitHeight
+                    implicitHeight: seekSlider.implicitHeight
+                    clip: true
+                    visible: root.seekBarAvailable && root.seekBarFits
+
+                    QQC2.Slider {
+                        id: seekSlider
+
+                        objectName: "seekSlider"
+                        x: 0
+                        y: parent.height - height
+                        width: parent.width
+                        height: implicitHeight
+                        implicitHeight: 14
+                        padding: 0
+                        from: 0
+                        to: root.seekDurationSeconds
+                        value: root.seekPositionSeconds
+                        stepSize: 1
+                        live: false
+                        focusPolicy: Qt.TabFocus
+                        enabled: root.seekBarAvailable
+                        readonly property real seekTrackCenterY: 6
+
+                        QQC2.ToolTip.visible: seekHoverHandler.hovered || pressed || activeFocus
+                        QQC2.ToolTip.delay: 0
+                        QQC2.ToolTip.text: root.player.formatTrackTime(seekPreviewSeconds) + " / " + root.player.formatTrackTime(root.seekDurationSeconds)
+
+                        readonly property real seekPreviewSeconds: Math.max(0, Math.min(root.seekDurationSeconds, pressed ? position * root.seekDurationSeconds : value))
+
+                        background: Item {
+                            implicitWidth: 200
+                            implicitHeight: root.seekLineThickness
+
+                            Rectangle {
+                                x: 0
+                                y: seekSlider.seekTrackCenterY - height / 2
+                                width: parent.width
+                                height: root.seekLineThickness
+                                radius: 2
+                                color: root.effectiveForegroundColor
+                                opacity: 0.25
+                            }
+
+                            Rectangle {
+                                x: 0
+                                y: seekSlider.seekTrackCenterY - height / 2
+                                width: seekSlider.visualPosition * parent.width
+                                height: root.seekLineThickness
+                                radius: 2
+                                color: root.effectiveForegroundColor
+                            }
+                        }
+
+                        handle: Rectangle {
+                            x: seekSlider.leftPadding + seekSlider.visualPosition * (seekSlider.availableWidth - width)
+                            y: seekSlider.seekTrackCenterY - height / 2
+                            implicitWidth: 8
+                            implicitHeight: 8
+                            radius: width / 2
+                            color: root.effectiveForegroundColor
+                        }
+
+                        HoverHandler {
+                            id: seekHoverHandler
+                        }
+
+                        onPressedChanged: {
+                            if (pressed) {
+                                root.seekPointerPending = true;
+                                root.seekScrubStartValue = value;
+                                root.seekScrubSnapshot = root.captureSeekSnapshot();
+                            } else if (root.seekPointerPending) {
+                                Qt.callLater(root.finishSeekPointerInteraction);
+                            }
+                        }
+                        onMoved: {
+                            if (pressed)
+                                return;
+                            if (root.seekPointerPending) {
+                                root.finishSeekPointerInteraction();
+                                return;
+                            }
+                            root.commitSeek(value, root.captureSeekSnapshot());
+                        }
+                    }
+                }
             }
         }
     }
@@ -312,6 +536,7 @@ Item {
     Visualizer {
         id: visualizer
 
+        objectName: "visualizer"
         visible: root.configuredVisualizerEnabled
         barColor: root.configuredVisualizerColorMode === "custom" ? (root.configuredVisualizerColor || "white") : root.effectiveForegroundColor
         barHeight: root.configuredVisualizerBarHeight
@@ -320,8 +545,18 @@ Item {
         scaleMode: root.configuredVisualizerScale
 
         x: root.contentInset
-        y: trackRow.y + trackRow.height + 16
+        y: trackRow.y + trackRow.height + root.visualizerGap
         width: visible ? root.availableContentWidth : 0
         height: visible ? Math.min(implicitHeight, Math.max(0, root.height - y - root.contentInset)) : 0
+    }
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.positionRefreshActive && root.player.playbackStatus === 2
+        onTriggered: {
+            if (!seekSlider.pressed)
+                root.player.updatePosition();
+        }
     }
 }

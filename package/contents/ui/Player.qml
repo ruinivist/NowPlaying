@@ -167,12 +167,13 @@ QtObject {
     }
 
     function formatTrackTime(s) {
-        const hours = Math.floor(s / 3600);
-        let minutes = Math.floor((s - hours * 3600) / 60);
-        let seconds = Math.ceil(s - hours * 3600 - minutes * 60);
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-        return minutes + ":" + seconds;
+        const totalSeconds = Math.floor(Number.isFinite(s) ? Math.max(0, s) : 0);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor(totalSeconds / 60) % 60;
+        const seconds = totalSeconds % 60;
+        const paddedMinutes = minutes < 10 ? "0" + minutes : minutes;
+        const paddedSeconds = seconds < 10 ? "0" + seconds : seconds;
+        return hours > 0 ? hours + ":" + paddedMinutes + ":" + paddedSeconds : paddedMinutes + ":" + paddedSeconds;
     }
 
     mpris2Model: Mpris.Mpris2Model {

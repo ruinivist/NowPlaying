@@ -19,6 +19,7 @@ Item {
     property real currentArtworkOpacity: 0
     property real incomingArtworkOpacity: 0
     property bool crossfadeActive: false
+    readonly property bool supportsMaskedArtwork: GraphicsInfo.api === GraphicsInfo.OpenGL || GraphicsInfo.api === GraphicsInfo.Vulkan
     readonly property bool artworkVisible: currentArtworkOpacity > 0 || incomingArtworkOpacity > 0
     readonly property bool holdsArtworkSlot: currentArtworkSource.length > 0 || artworkVisible
     readonly property real textOpacity: crossfadeActive || (currentArtworkSource.length > 0 && incomingArtworkSource.length > 0) ? 0 : 1 - Math.max(currentArtworkOpacity, incomingArtworkOpacity)
@@ -116,7 +117,7 @@ Item {
         asynchronous: true
         cache: true
         fillMode: Image.PreserveAspectCrop
-        opacity: 0
+        opacity: labelContent.supportsMaskedArtwork ? 0 : labelContent.currentArtworkOpacity
         source: labelContent.currentArtworkSource
         sourceSize.width: labelContent.artworkSize
         sourceSize.height: labelContent.artworkSize
@@ -129,7 +130,7 @@ Item {
         asynchronous: true
         cache: true
         fillMode: Image.PreserveAspectCrop
-        opacity: 0
+        opacity: labelContent.supportsMaskedArtwork ? 0 : labelContent.incomingArtworkOpacity
         source: labelContent.incomingArtworkSource
         sourceSize.width: labelContent.artworkSize
         sourceSize.height: labelContent.artworkSize
@@ -151,7 +152,7 @@ Item {
         anchors.fill: parent
         antialiasing: true
         color: "white"
-        layer.enabled: true
+        layer.enabled: labelContent.supportsMaskedArtwork
         radius: labelContent.borderRadius
         visible: false
     }
@@ -165,7 +166,7 @@ Item {
         maskSource: artworkMaskShape
         source: currentArtworkImage
         opacity: labelContent.currentArtworkOpacity
-        visible: labelContent.currentArtworkSource.length > 0 && opacity > 0
+        visible: labelContent.supportsMaskedArtwork && labelContent.currentArtworkSource.length > 0 && opacity > 0
     }
 
     MultiEffect {
@@ -177,7 +178,7 @@ Item {
         maskSource: artworkMaskShape
         source: incomingArtworkImage
         opacity: labelContent.incomingArtworkOpacity
-        visible: labelContent.incomingArtworkSource.length > 0 && opacity > 0
+        visible: labelContent.supportsMaskedArtwork && labelContent.incomingArtworkSource.length > 0 && opacity > 0
     }
 
     Column {

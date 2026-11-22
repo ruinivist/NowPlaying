@@ -182,8 +182,6 @@ Item {
         const duration = Math.round(root.player.songLength);
         const position = Math.max(0, Math.min(duration, Math.round(Math.max(0, Math.min(seconds, root.seekDurationSeconds)) * 1000000)));
         root.player.setPosition(position);
-        if (root.visible)
-            root.player.updatePosition();
     }
 
     function finishSeekPointerInteraction() {

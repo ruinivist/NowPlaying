@@ -69,7 +69,7 @@ Item {
     readonly property int effectiveTitleFontSize: Math.max(1, configuredTitleFontSize)
     readonly property int effectiveArtistFontSize: Math.max(1, configuredArtistFontSize)
     readonly property int effectiveTrackTextVerticalSpacing: configuredTrackTextVerticalSpacing
-    readonly property int seekLineThickness: 4
+    readonly property int seekLineThickness: 2
     readonly property int effectiveLabelVerticalSpacing: configuredLabelVerticalSpacing
     readonly property int effectiveSeparatorGapLabel: Math.max(0, configuredSeparatorGapLabel)
     readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
@@ -98,18 +98,21 @@ Item {
         if (root.seekRevealProgress <= 0 || spacing <= 0)
             return spacing;
 
-        const remaining = trackRow.height - root.seekMinimumTextHeight - root.seekRevealProgress * seekSlider.implicitHeight;
+        const remaining = infoColumnWrapper.seekGapEnd - root.seekMinimumTextHeight - seekBarRow.height;
         return Math.min(spacing, Math.max(0, remaining));
     }
     readonly property real seekTextFitScale: {
         if (root.seekRevealProgress <= 0)
             return 1;
 
-        const availableTextHeight = trackRow.height - root.seekLayoutSpacing - root.seekRevealProgress * seekSlider.implicitHeight;
-        return Math.min(1, Math.max(root.seekMinimumTextHeight, availableTextHeight) / root.seekBaseTextHeight);
+        const availableTextHeight = infoColumnWrapper.seekGapEnd - root.seekLayoutSpacing - seekBarRow.height;
+        if (availableTextHeight >= root.seekBaseTextHeight)
+            return 1;
+
+        // Allow for whole-pixel font sizes and layout rounding.
+        return Math.max(root.seekMinimumTextHeight, availableTextHeight - 2) / root.seekBaseTextHeight;
     }
     readonly property bool seekBarFits: trackRow.height >= seekMinimumTextHeight + seekSlider.implicitHeight
-    readonly property real appliedSeekReveal: root.configuredVisualizerEnabled && seekBarRow.visible ? root.seekRevealProgress : 0
 
     FontMetrics {
         id: titleFontMetrics
@@ -383,6 +386,8 @@ Item {
         Item {
             id: infoColumnWrapper
 
+            readonly property real seekGapEnd: root.configuredVisualizerEnabled ? visualizer.y - trackRow.y - y : height
+
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumWidth: 0
@@ -394,7 +399,12 @@ Item {
 
                 objectName: "infoColumn"
                 x: 0
-                y: (parent.height - height) * (0.5 + root.appliedSeekReveal * 0.5)
+                y: {
+                    const textWasCompressed = root.seekTextFitScale < 1 || root.seekLayoutSpacing !== root.effectiveTrackTextVerticalSpacing;
+                    const restingHeight = textWasCompressed ? Math.max(height, root.seekBaseTextHeight + root.effectiveTrackTextVerticalSpacing) : height;
+                    const centeredY = Math.max(0, (parent.height - restingHeight) / 2);
+                    return seekBarRow.height > 0 ? Math.max(0, Math.min(centeredY, parent.seekGapEnd - height - seekBarRow.height)) : centeredY;
+                }
                 width: parent.width
                 height: implicitHeight
                 spacing: 0
@@ -427,99 +437,97 @@ Item {
                     elide: Text.ElideRight
                     horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
                 }
+            }
 
-                Item {
-                    id: seekBarRow
+            Item {
+                id: seekBarRow
 
-                    objectName: "seekBarRow"
-                    Layout.fillWidth: true
-                    Layout.minimumHeight: 0
-                    Layout.preferredHeight: root.seekRevealProgress * seekSlider.implicitHeight
-                    Layout.maximumHeight: root.seekRevealProgress * seekSlider.implicitHeight
-                    implicitHeight: seekSlider.implicitHeight
-                    clip: true
-                    visible: root.seekBarAvailable && root.seekBarFits
+                objectName: "seekBarRow"
+                y: (infoColumn.y + infoColumn.height + parent.seekGapEnd - height) / 2
+                width: parent.width
+                height: visible ? root.seekRevealProgress * seekSlider.implicitHeight : 0
+                clip: true
+                visible: root.seekBarAvailable && root.seekBarFits
 
-                    QQC2.Slider {
-                        id: seekSlider
+                QQC2.Slider {
+                    id: seekSlider
 
-                        objectName: "seekSlider"
-                        x: 0
-                        y: parent.height - height
-                        width: parent.width
-                        height: implicitHeight
-                        implicitHeight: 14
-                        padding: 0
-                        from: 0
-                        to: root.seekDurationSeconds
-                        value: root.seekPositionSeconds
-                        stepSize: 1
-                        live: false
-                        focusPolicy: Qt.TabFocus
-                        enabled: root.seekBarAvailable
-                        readonly property real seekTrackCenterY: 6
+                    objectName: "seekSlider"
+                    x: 0
+                    y: (parent.height - height) / 2
+                    width: parent.width
+                    height: implicitHeight
+                    implicitHeight: 14
+                    padding: 0
+                    from: 0
+                    to: root.seekDurationSeconds
+                    value: root.seekPositionSeconds
+                    stepSize: 1
+                    live: false
+                    focusPolicy: Qt.TabFocus
+                    enabled: root.seekBarAvailable
+                    readonly property real seekTrackCenterY: height / 2
 
-                        QQC2.ToolTip.visible: seekHoverHandler.hovered || pressed || activeFocus
-                        QQC2.ToolTip.delay: 0
-                        QQC2.ToolTip.text: root.player.formatTrackTime(seekPreviewSeconds) + " / " + root.player.formatTrackTime(root.seekDurationSeconds)
+                    QQC2.ToolTip.visible: seekHoverHandler.hovered || pressed || activeFocus
+                    QQC2.ToolTip.delay: 0
+                    QQC2.ToolTip.text: root.player.formatTrackTime(seekPreviewSeconds) + " / " + root.player.formatTrackTime(root.seekDurationSeconds)
 
-                        readonly property real seekPreviewSeconds: Math.max(0, Math.min(root.seekDurationSeconds, pressed ? position * root.seekDurationSeconds : value))
+                    readonly property real seekPreviewSeconds: Math.max(0, Math.min(root.seekDurationSeconds, pressed ? position * root.seekDurationSeconds : value))
 
-                        background: Item {
-                            implicitWidth: 200
-                            implicitHeight: root.seekLineThickness
+                    background: Item {
+                        implicitWidth: 200
+                        implicitHeight: root.seekLineThickness
 
-                            Rectangle {
-                                x: 0
-                                y: seekSlider.seekTrackCenterY - height / 2
-                                width: parent.width
-                                height: root.seekLineThickness
-                                radius: 2
-                                color: root.effectiveForegroundColor
-                                opacity: 0.25
-                            }
-
-                            Rectangle {
-                                x: 0
-                                y: seekSlider.seekTrackCenterY - height / 2
-                                width: seekSlider.visualPosition * parent.width
-                                height: root.seekLineThickness
-                                radius: 2
-                                color: root.effectiveForegroundColor
-                            }
+                        Rectangle {
+                            x: 0
+                            y: seekSlider.seekTrackCenterY - height / 2
+                            width: parent.width
+                            height: root.seekLineThickness
+                            radius: 2
+                            color: root.effectiveForegroundColor
+                            opacity: 0.25
                         }
 
-                        handle: Rectangle {
-                            x: seekSlider.leftPadding + seekSlider.visualPosition * (seekSlider.availableWidth - width)
+                        Rectangle {
+                            x: 0
                             y: seekSlider.seekTrackCenterY - height / 2
-                            implicitWidth: 8
-                            implicitHeight: 8
-                            radius: width / 2
+                            width: seekSlider.visualPosition * parent.width
+                            height: root.seekLineThickness
+                            radius: 2
                             color: root.effectiveForegroundColor
                         }
+                    }
 
-                        HoverHandler {
-                            id: seekHoverHandler
-                        }
+                    handle: Rectangle {
+                        x: seekSlider.leftPadding + seekSlider.visualPosition * (seekSlider.availableWidth - width)
+                        y: seekSlider.seekTrackCenterY - height / 2
+                        implicitWidth: 8
+                        implicitHeight: 8
+                        radius: width / 2
+                        color: root.effectiveForegroundColor
+                    }
 
-                        onPressedChanged: {
-                            if (pressed) {
-                                root.seekPointerPending = true;
-                                root.seekScrubStartValue = value;
-                                root.seekScrubSnapshot = root.captureSeekSnapshot();
-                            } else if (root.seekPointerPending) {
-                                Qt.callLater(root.finishSeekPointerInteraction);
-                            }
+                    HoverHandler {
+                        id: seekHoverHandler
+                    }
+
+                    onPressedChanged: {
+                        if (pressed) {
+                            root.seekPointerPending = true;
+                            root.seekScrubStartValue = value;
+                            root.seekScrubSnapshot = root.captureSeekSnapshot();
+                        } else if (root.seekPointerPending) {
+                            Qt.callLater(root.finishSeekPointerInteraction);
                         }
-                        onMoved: {
-                            if (pressed)
-                                return;
-                            if (root.seekPointerPending) {
-                                root.finishSeekPointerInteraction();
-                                return;
-                            }
-                            root.commitSeek(value, root.captureSeekSnapshot());
+                    }
+                    onMoved: {
+                        if (pressed)
+                            return;
+                        if (root.seekPointerPending) {
+                            root.finishSeekPointerInteraction();
+                            return;
                         }
+                        root.commitSeek(value, root.captureSeekSnapshot());
                     }
                 }
             }

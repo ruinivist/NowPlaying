@@ -27,6 +27,8 @@ KCM.SimpleKCM {
     property bool cfg_showMediaControls: true
     property string cfg_playbackButtonsMode
     property string cfg_seekBarMode
+    property alias cfg_seekBarHeight: seekBarHeightSpinBox.value
+    property alias cfg_showSeekTime: showSeekTimeCheckBox.checked
     property alias cfg_sourcePriority: sourcePriorityField.text
     property alias cfg_sourceWhitelist: sourceWhitelistCheckBox.checked
     property alias cfg_trackTextVerticalSpacing: trackTextVerticalSpacingSpinBox.value
@@ -297,6 +299,22 @@ KCM.SimpleKCM {
                 return option.value === configRoot.cfg_seekBarMode;
             }))
             onActivated: configRoot.cfg_seekBarMode = currentValue
+        }
+
+        QQC2.SpinBox {
+            id: seekBarHeightSpinBox
+
+            Kirigami.FormData.label: i18n("Seek bar height (px):")
+            from: 1
+            to: 8
+            editable: true
+        }
+
+        QQC2.CheckBox {
+            id: showSeekTimeCheckBox
+
+            Kirigami.FormData.label: i18n("Seek time:")
+            text: i18n("Show seek time")
         }
 
         SectionHeader {

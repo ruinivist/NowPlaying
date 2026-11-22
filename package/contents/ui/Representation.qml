@@ -23,6 +23,8 @@ Item {
     property bool configuredTextShadowEnabled: false
     property string configuredPlaybackButtonsMode: "hover"
     property string configuredSeekBarMode: "hover"
+    property int configuredSeekBarHeight: 2
+    property bool configuredShowSeekTime: true
     property int configuredTrackTextVerticalSpacing: 5
     property int configuredLabelVerticalSpacing: 0
     property int configuredSeparatorGapLabel: 4
@@ -50,7 +52,7 @@ Item {
     // Keep artwork and labels sized to the track row instead of the taller widget.
     readonly property int labelRailSize: Math.max(0, Math.min(trackRow.height, maxLabelRailSize))
     readonly property bool mediaControlsTargetShown: mediaControlsEnabled && !hideNowPlayingArea && (effectivePlaybackButtonsMode === "always" || playbackHoverActive)
-    readonly property int artworkControlsGap: configuredUseLabelArtwork && root.player.artUrl.length > 0 ? 2 : 0
+    readonly property int artworkControlsGap: configuredUseLabelArtwork && root.player.artUrl.length > 0 ? 6 : 0
     readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1
     property real labelContentScale: mediaControlsTargetShown ? labelShrunkScale : 1
     readonly property real controlsReveal: {
@@ -69,7 +71,7 @@ Item {
     readonly property int effectiveTitleFontSize: Math.max(1, configuredTitleFontSize)
     readonly property int effectiveArtistFontSize: Math.max(1, configuredArtistFontSize)
     readonly property int effectiveTrackTextVerticalSpacing: configuredTrackTextVerticalSpacing
-    readonly property int seekLineThickness: 2
+    readonly property int seekLineThickness: Math.max(1, Math.min(8, configuredSeekBarHeight))
     readonly property int effectiveLabelVerticalSpacing: configuredLabelVerticalSpacing
     readonly property int effectiveSeparatorGapLabel: Math.max(0, configuredSeparatorGapLabel)
     readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
@@ -305,10 +307,14 @@ Item {
             RowLayout {
                 id: mediaControls
 
-                x: root.labelsOnRight ? 0 : leftColumn.width - width
+                x: {
+                    const centeredX = labelSlot.x + (labelSlot.width - width) / 2;
+                    return root.labelsOnRight ? Math.max(0, centeredX) : Math.min(leftColumn.width - width, centeredX);
+                }
                 y: root.labelContentSize + root.artworkControlsGap
                 width: implicitWidth
                 height: root.buttonSize
+                spacing: Math.min(12, Math.max(0, (leftColumn.width - 3 * root.buttonSize) / 2))
                 clip: true
                 enabled: root.mediaControlsTargetShown
                 opacity: root.controlsReveal
@@ -410,6 +416,8 @@ Item {
                 spacing: 0
 
                 ShadowedLabel {
+                    id: titleLabel
+
                     objectName: "titleLabel"
                     Layout.fillWidth: true
                     Layout.bottomMargin: root.seekLayoutSpacing
@@ -425,6 +433,8 @@ Item {
                 }
 
                 ShadowedLabel {
+                    id: artistLabel
+
                     objectName: "artistLabel"
                     Layout.fillWidth: true
                     Layout.alignment: root.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
@@ -467,10 +477,6 @@ Item {
                     focusPolicy: Qt.TabFocus
                     enabled: root.seekBarAvailable
                     readonly property real seekTrackCenterY: height / 2
-
-                    QQC2.ToolTip.visible: seekHoverHandler.hovered || pressed || activeFocus
-                    QQC2.ToolTip.delay: 0
-                    QQC2.ToolTip.text: root.player.formatTrackTime(seekPreviewSeconds) + " / " + root.player.formatTrackTime(root.seekDurationSeconds)
 
                     readonly property real seekPreviewSeconds: Math.max(0, Math.min(root.seekDurationSeconds, pressed ? position * root.seekDurationSeconds : value))
 
@@ -529,6 +535,27 @@ Item {
                         }
                         root.commitSeek(value, root.captureSeekSnapshot());
                     }
+                }
+            }
+
+            Text {
+                id: seekTime
+
+                objectName: "seekTime"
+                anchors.right: seekBarRow.right
+                y: seekBarRow.y + seekBarRow.height / 2 - height - 6
+                opacity: root.seekRevealProgress
+                visible: root.configuredShowSeekTime && seekBarRow.visible && seekBarRow.height > 0 && x >= 0 && y >= 0 && !overlaps(titleLabel) && !overlaps(artistLabel)
+                text: root.player.formatTrackTime(seekSlider.seekPreviewSeconds) + " / " + root.player.formatTrackTime(root.seekDurationSeconds)
+                color: root.effectiveForegroundColor
+                font.family: root.configuredFontFamily
+                font.pixelSize: 14
+                font.italic: true
+                textFormat: Text.PlainText
+
+                function overlaps(label) {
+                    const labelTop = infoColumn.y + label.y;
+                    return label.text.length > 0 && y < labelTop + label.height && y + height > labelTop && (root.labelsOnRight || x < label.x + Math.min(label.width, label.implicitWidth) + 4);
                 }
             }
         }

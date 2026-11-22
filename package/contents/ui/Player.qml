@@ -173,7 +173,7 @@ QtObject {
         const seconds = totalSeconds % 60;
         const paddedMinutes = minutes < 10 ? "0" + minutes : minutes;
         const paddedSeconds = seconds < 10 ? "0" + seconds : seconds;
-        return hours > 0 ? hours + ":" + paddedMinutes + ":" + paddedSeconds : paddedMinutes + ":" + paddedSeconds;
+        return hours > 0 ? hours + ":" + paddedMinutes + ":" + paddedSeconds : minutes + ":" + paddedSeconds;
     }
 
     mpris2Model: Mpris.Mpris2Model {

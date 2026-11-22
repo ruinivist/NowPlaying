@@ -46,6 +46,10 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredSeekBarMode: plasmoid.configuration.seekBarMode
     // qmllint disable missing-property
+    property int configuredSeekBarHeight: plasmoid.configuration.seekBarHeight
+    // qmllint disable missing-property
+    property bool configuredShowSeekTime: plasmoid.configuration.showSeekTime
+    // qmllint disable missing-property
     property string configuredSourcePriority: plasmoid.configuration.sourcePriority
     // qmllint disable missing-property
     property bool configuredSourceWhitelist: plasmoid.configuration.sourceWhitelist
@@ -132,6 +136,8 @@ PlasmoidItem {
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
         configuredPlaybackButtonsMode: root.configuredPlaybackButtonsMode
         configuredSeekBarMode: root.configuredSeekBarMode
+        configuredSeekBarHeight: root.configuredSeekBarHeight
+        configuredShowSeekTime: root.configuredShowSeekTime
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel
@@ -172,6 +178,8 @@ PlasmoidItem {
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
         configuredPlaybackButtonsMode: root.configuredPlaybackButtonsMode
         configuredSeekBarMode: root.configuredSeekBarMode
+        configuredSeekBarHeight: root.configuredSeekBarHeight
+        configuredShowSeekTime: root.configuredShowSeekTime
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
         configuredSeparatorGapLabel: root.configuredSeparatorGapLabel

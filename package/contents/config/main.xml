@@ -78,6 +78,16 @@ PLAYING]]></default>
             <label>Seek bar mode</label>
             <default>hover</default>
         </entry>
+        <entry name="seekBarHeight" type="Int">
+            <label>Seek bar height</label>
+            <default>2</default>
+            <min>1</min>
+            <max>8</max>
+        </entry>
+        <entry name="showSeekTime" type="Bool">
+            <label>Show seek time</label>
+            <default>true</default>
+        </entry>
         <entry name="sourcePriority" type="String">
             <label>Source priority</label>
             <default></default>

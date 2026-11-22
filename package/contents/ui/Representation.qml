@@ -105,10 +105,8 @@ Item {
         if (root.seekRevealProgress <= 0)
             return 1;
 
-        const baseScale = 1 - 0.12 * root.seekRevealProgress;
-        const baseTextHeight = root.seekBaseTextHeight * baseScale;
         const availableTextHeight = trackRow.height - root.seekLayoutSpacing - root.seekRevealProgress * seekSlider.implicitHeight;
-        return Math.min(1, Math.max(root.seekMinimumTextHeight / baseTextHeight, availableTextHeight / baseTextHeight));
+        return Math.min(1, Math.max(root.seekMinimumTextHeight, availableTextHeight) / root.seekBaseTextHeight);
     }
     readonly property bool seekBarFits: trackRow.height >= seekMinimumTextHeight + seekSlider.implicitHeight
     readonly property real appliedSeekReveal: root.configuredVisualizerEnabled && seekBarRow.visible ? root.seekRevealProgress : 0
@@ -409,7 +407,7 @@ Item {
                     Layout.bottomMargin: root.seekLayoutSpacing
                     shadowEnabled: root.configuredTextShadowEnabled
                     text: root.player.title
-                    font.pixelSize: Math.max(1, Math.round(root.effectiveTitleFontSize * (1 - 0.12 * root.seekRevealProgress) * root.seekTextFitScale))
+                    font.pixelSize: Math.max(1, Math.round(root.effectiveTitleFontSize * root.seekTextFitScale))
                     font.bold: true
                     font.family: root.configuredFontFamily
                     color: root.effectiveForegroundColor
@@ -424,7 +422,7 @@ Item {
                     Layout.alignment: root.labelsOnRight ? Qt.AlignRight : Qt.AlignLeft
                     shadowEnabled: root.configuredTextShadowEnabled
                     text: root.player.artists
-                    font.pixelSize: Math.max(1, Math.round(root.effectiveArtistFontSize * (1 - 0.12 * root.seekRevealProgress) * root.seekTextFitScale))
+                    font.pixelSize: Math.max(1, Math.round(root.effectiveArtistFontSize * root.seekTextFitScale))
                     font.family: root.configuredFontFamily
                     color: root.effectiveForegroundColor
                     lineHeight: 0.8

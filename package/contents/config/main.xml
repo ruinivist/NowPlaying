@@ -13,6 +13,10 @@
             <label>Font family</label>
             <default>Noto Sans</default>
         </entry>
+        <entry name="trackTextItalic" type="Bool">
+            <label>Italic track title and artist</label>
+            <default>false</default>
+        </entry>
         <entry name="labelFontSize" type="Int">
             <label>Now Playing label font size</label>
             <default>16</default>

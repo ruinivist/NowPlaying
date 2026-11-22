@@ -8,6 +8,7 @@ Item {
 
     required property var player
     property string configuredFontFamily: "Noto Sans"
+    property bool configuredTrackTextItalic: false
     property int configuredLabelFontSize: 16
     property int configuredTitleFontSize: 28
     property int configuredArtistFontSize: 26
@@ -122,6 +123,7 @@ Item {
         font.family: root.configuredFontFamily
         font.pixelSize: root.effectiveTitleFontSize
         font.bold: true
+        font.italic: root.configuredTrackTextItalic
     }
 
     FontMetrics {
@@ -129,6 +131,7 @@ Item {
 
         font.family: root.configuredFontFamily
         font.pixelSize: root.effectiveArtistFontSize
+        font.italic: root.configuredTrackTextItalic
     }
 
     FontMetrics {
@@ -137,6 +140,7 @@ Item {
         font.family: root.configuredFontFamily
         font.pixelSize: Math.min(2, root.effectiveTitleFontSize)
         font.bold: true
+        font.italic: root.configuredTrackTextItalic
     }
 
     FontMetrics {
@@ -144,6 +148,7 @@ Item {
 
         font.family: root.configuredFontFamily
         font.pixelSize: Math.min(2, root.effectiveArtistFontSize)
+        font.italic: root.configuredTrackTextItalic
     }
 
     visible: hasTrackInfo || effectiveLabelVisibilityMode === "always"
@@ -425,6 +430,7 @@ Item {
                     text: root.player.title
                     font.pixelSize: Math.max(1, Math.round(root.effectiveTitleFontSize * root.seekTextFitScale))
                     font.bold: true
+                    font.italic: root.configuredTrackTextItalic
                     font.family: root.configuredFontFamily
                     color: root.effectiveForegroundColor
                     lineHeight: 0.8
@@ -441,6 +447,7 @@ Item {
                     shadowEnabled: root.configuredTextShadowEnabled
                     text: root.player.artists
                     font.pixelSize: Math.max(1, Math.round(root.effectiveArtistFontSize * root.seekTextFitScale))
+                    font.italic: root.configuredTrackTextItalic
                     font.family: root.configuredFontFamily
                     color: root.effectiveForegroundColor
                     lineHeight: 0.8

@@ -11,6 +11,7 @@ KCM.SimpleKCM {
 
     property alias cfg_opacity: opacitySpinBox.value
     property string cfg_fontFamily
+    property alias cfg_trackTextItalic: trackTextItalicCheckBox.checked
     property alias cfg_labelFontSize: labelFontSizeSpinBox.value
     property alias cfg_titleFontSize: titleFontSizeSpinBox.value
     property alias cfg_artistFontSize: artistFontSizeSpinBox.value
@@ -160,6 +161,12 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Font:")
             model: configRoot.availableFonts
             onActivated: configRoot.cfg_fontFamily = currentText
+        }
+
+        QQC2.CheckBox {
+            id: trackTextItalicCheckBox
+
+            text: i18n("Italic track title and artist")
         }
 
         QQC2.ComboBox {

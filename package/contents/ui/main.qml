@@ -15,6 +15,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property string configuredFontFamily: plasmoid.configuration.fontFamily
     // qmllint disable missing-property
+    property bool configuredTrackTextItalic: plasmoid.configuration.trackTextItalic
+    // qmllint disable missing-property
     property int configuredLabelFontSize: plasmoid.configuration.labelFontSize
     // qmllint disable missing-property
     property int configuredTitleFontSize: plasmoid.configuration.titleFontSize
@@ -121,6 +123,7 @@ PlasmoidItem {
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
+        configuredTrackTextItalic: root.configuredTrackTextItalic
         configuredLabelFontSize: root.configuredLabelFontSize
         configuredTitleFontSize: root.configuredTitleFontSize
         configuredArtistFontSize: root.configuredArtistFontSize
@@ -163,6 +166,7 @@ PlasmoidItem {
         Layout.preferredWidth: root.width
         Layout.preferredHeight: root.height
         configuredFontFamily: root.configuredFontFamily
+        configuredTrackTextItalic: root.configuredTrackTextItalic
         configuredLabelFontSize: root.configuredLabelFontSize
         configuredTitleFontSize: root.configuredTitleFontSize
         configuredArtistFontSize: root.configuredArtistFontSize

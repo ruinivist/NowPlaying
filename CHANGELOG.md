@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.1] - Qt compatibility
+
+- Builds the visualizer plugin with Qt 6.4 so NowPlaying can load on Debian 13.
+
 ## [1.6] - Seek bar
 
 **Features**

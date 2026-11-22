@@ -70,6 +70,10 @@ PLAYING]]></default>
             <label>Show media controls</label>
             <default>true</default>
         </entry>
+        <entry name="playbackButtonsMode" type="String">
+            <label>Playback buttons visibility</label>
+            <default></default>
+        </entry>
         <entry name="seekBarMode" type="String">
             <label>Seek bar mode</label>
             <default>hover</default>

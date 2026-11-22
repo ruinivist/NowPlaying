@@ -42,7 +42,7 @@ PlasmoidItem {
     // qmllint disable missing-property
     property bool configuredTextShadowEnabled: plasmoid.configuration.textShadowEnabled
     // qmllint disable missing-property
-    property bool configuredShowMediaControls: plasmoid.configuration.showMediaControls
+    property string configuredPlaybackButtonsMode: plasmoid.configuration.playbackButtonsMode || (plasmoid.configuration.showMediaControls ? "hover" : "hidden")
     // qmllint disable missing-property
     property string configuredSeekBarMode: plasmoid.configuration.seekBarMode
     // qmllint disable missing-property
@@ -130,7 +130,7 @@ PlasmoidItem {
         configuredBackgroundRadius: root.configuredBackgroundRadius
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
-        configuredShowMediaControls: root.configuredShowMediaControls
+        configuredPlaybackButtonsMode: root.configuredPlaybackButtonsMode
         configuredSeekBarMode: root.configuredSeekBarMode
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing
@@ -170,7 +170,7 @@ PlasmoidItem {
         configuredBackgroundRadius: root.configuredBackgroundRadius
         configuredForegroundColor: root.configuredForegroundColor
         configuredTextShadowEnabled: root.configuredTextShadowEnabled
-        configuredShowMediaControls: root.configuredShowMediaControls
+        configuredPlaybackButtonsMode: root.configuredPlaybackButtonsMode
         configuredSeekBarMode: root.configuredSeekBarMode
         configuredTrackTextVerticalSpacing: root.configuredTrackTextVerticalSpacing
         configuredLabelVerticalSpacing: root.configuredLabelVerticalSpacing

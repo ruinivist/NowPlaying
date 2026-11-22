@@ -21,7 +21,7 @@ Item {
     property int configuredBackgroundRadius: 0
     property string configuredForegroundColor: "white"
     property bool configuredTextShadowEnabled: false
-    property bool configuredShowMediaControls: true
+    property string configuredPlaybackButtonsMode: "hover"
     property string configuredSeekBarMode: "hover"
     property int configuredTrackTextVerticalSpacing: 5
     property int configuredLabelVerticalSpacing: 0
@@ -49,7 +49,7 @@ Item {
     readonly property int maxLabelRailSize: Math.max(0, availableContentWidth - separatorReservedWidth)
     // Keep artwork and labels sized to the track row instead of the taller widget.
     readonly property int labelRailSize: Math.max(0, Math.min(trackRow.height, maxLabelRailSize))
-    readonly property bool mediaControlsTargetShown: mediaControlsEnabled && controlsHoverActive && !hideNowPlayingArea
+    readonly property bool mediaControlsTargetShown: mediaControlsEnabled && !hideNowPlayingArea && (effectivePlaybackButtonsMode === "always" || playbackHoverActive)
     readonly property int artworkControlsGap: configuredUseLabelArtwork && root.player.artUrl.length > 0 ? 2 : 0
     readonly property real labelShrunkScale: labelRailSize > 0 ? Math.max(0, (labelRailSize - buttonSize - artworkControlsGap) / labelRailSize) : 1
     property real labelContentScale: mediaControlsTargetShown ? labelShrunkScale : 1
@@ -75,13 +75,14 @@ Item {
     readonly property int effectiveSeparatorGapTrack: Math.max(0, configuredSeparatorGapTrack)
     readonly property int effectiveSeparatorHeight: Math.max(0, Math.min(100, configuredSeparatorHeight))
     readonly property var effectiveLabelLines: (configuredLabelText || "").split(/\r?\n/)
-    readonly property bool mediaControlsEnabled: configuredShowMediaControls
+    readonly property string effectivePlaybackButtonsMode: configuredPlaybackButtonsMode === "always" || configuredPlaybackButtonsMode === "hidden" ? configuredPlaybackButtonsMode : "hover"
+    readonly property bool mediaControlsEnabled: effectivePlaybackButtonsMode !== "hidden"
     readonly property string effectiveSeekBarMode: configuredSeekBarMode === "always" || configuredSeekBarMode === "hidden" ? configuredSeekBarMode : "hover"
-    readonly property bool hoverActivationEnabled: mediaControlsEnabled || effectiveSeekBarMode === "hover"
+    readonly property bool hoverActivationEnabled: effectivePlaybackButtonsMode === "hover" || effectiveSeekBarMode === "hover"
     readonly property bool seekBarAvailable: effectiveSeekBarMode !== "hidden" && root.player.ready && root.player.canSeek && Number.isFinite(root.player.songLength) && root.player.songLength > 0
     readonly property real seekDurationSeconds: seekBarAvailable ? root.player.songLength / 1000000 : 0
     readonly property real seekPositionSeconds: seekBarAvailable && Number.isFinite(root.player.songPosition) ? Math.max(0, Math.min(seekDurationSeconds, root.player.songPosition / 1000000)) : 0
-    readonly property bool seekRevealTargetShown: seekBarAvailable && seekBarFits && (effectiveSeekBarMode === "always" || rawHoverActive || hoverExitTimer.running || seekSlider.activeFocus || seekSlider.pressed || seekHoverHandler.hovered)
+    readonly property bool seekRevealTargetShown: seekBarAvailable && seekBarFits && (effectiveSeekBarMode === "always" || playbackHoverActive)
     readonly property bool positionRefreshActive: visible && seekRevealTargetShown
     property real seekRevealProgress: seekRevealTargetShown ? 1 : 0
     property var seekScrubSnapshot: null
@@ -89,7 +90,7 @@ Item {
     property bool seekPointerPending: false
     readonly property bool hasTrackInfo: root.player.ready && (((root.player.title || "").trim().length > 0) || ((root.player.artists || "").trim().length > 0))
     readonly property bool rawHoverActive: rootHoverHandler.hovered
-    readonly property bool controlsHoverActive: mediaControlsEnabled && (rawHoverActive || hoverExitTimer.running)
+    readonly property bool playbackHoverActive: rawHoverActive || hoverExitTimer.running || (seekBarAvailable && seekBarFits && (seekSlider.pressed || seekHoverHandler.hovered || (effectiveSeekBarMode === "hover" && seekSlider.activeFocus)))
     readonly property real seekMinimumTextHeight: Math.ceil(minimumTitleFontMetrics.height) + Math.ceil(minimumArtistFontMetrics.height)
     readonly property real seekBaseTextHeight: titleFontMetrics.height + artistFontMetrics.height
     readonly property real seekLayoutSpacing: {
@@ -154,11 +155,7 @@ Item {
         else
             hoverExitTimer.restart();
     }
-    onMediaControlsEnabledChanged: {
-        if (!root.hoverActivationEnabled)
-            hoverExitTimer.stop();
-    }
-    onEffectiveSeekBarModeChanged: {
+    onHoverActivationEnabledChanged: {
         if (!root.hoverActivationEnabled)
             hoverExitTimer.stop();
     }

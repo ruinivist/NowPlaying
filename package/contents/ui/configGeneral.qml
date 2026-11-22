@@ -24,7 +24,8 @@ KCM.SimpleKCM {
     property alias cfg_backgroundRadius: backgroundRadiusSpinBox.value
     property alias cfg_foregroundColor: foregroundColorField.text
     property alias cfg_textShadowEnabled: textShadowCheckBox.checked
-    property alias cfg_showMediaControls: showMediaControlsCheckBox.checked
+    property bool cfg_showMediaControls: true
+    property string cfg_playbackButtonsMode
     property string cfg_seekBarMode
     property alias cfg_sourcePriority: sourcePriorityField.text
     property alias cfg_sourceWhitelist: sourceWhitelistCheckBox.checked
@@ -61,14 +62,14 @@ KCM.SimpleKCM {
         "text": i18n("Solid background"),
         "value": "default"
     }]
-    readonly property var seekBarModeOptions: [{
+    readonly property var playbackVisibilityOptions: [{
         "text": i18n("On hover"),
         "value": "hover"
     }, {
-        "text": i18n("Always show"),
+        "text": i18n("Always"),
         "value": "always"
     }, {
-        "text": i18n("Always hide"),
+        "text": i18n("Never"),
         "value": "hidden"
     }]
     readonly property bool hasSourcePriorityEntries: sourcePriorityField.text.split(",").some((entry) => {
@@ -135,12 +136,6 @@ KCM.SimpleKCM {
         const resolvedValue = syncComboByValue(backgroundStyleComboBox, backgroundStyleOptions, cfg_backgroundStyle, "custom");
         if (cfg_backgroundStyle !== resolvedValue)
             cfg_backgroundStyle = resolvedValue;
-
-    }
-    onCfg_seekBarModeChanged: {
-        const resolvedValue = syncComboByValue(seekBarModeComboBox, seekBarModeOptions, cfg_seekBarMode, "hover");
-        if (cfg_seekBarMode !== resolvedValue)
-            cfg_seekBarMode = resolvedValue;
 
     }
 
@@ -232,23 +227,6 @@ KCM.SimpleKCM {
             text: i18n("Enable")
         }
 
-        QQC2.CheckBox {
-            id: showMediaControlsCheckBox
-
-            Kirigami.FormData.label: i18n("Media controls:")
-            text: i18n("Show media controls")
-        }
-
-        QQC2.ComboBox {
-            id: seekBarModeComboBox
-
-            Kirigami.FormData.label: i18n("Seek bar:")
-            model: configRoot.seekBarModeOptions
-            textRole: "text"
-            valueRole: "value"
-            onActivated: configRoot.cfg_seekBarMode = currentValue
-        }
-
         QQC2.TextField {
             id: sourcePriorityField
 
@@ -290,6 +268,35 @@ KCM.SimpleKCM {
 
             Kirigami.FormData.label: i18n("Separator:")
             text: i18n("Hide separator")
+        }
+
+        SectionHeader {
+            title: i18n("Playback")
+        }
+
+        QQC2.ComboBox {
+            Kirigami.FormData.label: i18n("Playback buttons:")
+            model: configRoot.playbackVisibilityOptions
+            textRole: "text"
+            valueRole: "value"
+            currentIndex: {
+                const mode = configRoot.cfg_playbackButtonsMode || (configRoot.cfg_showMediaControls ? "hover" : "hidden");
+                return Math.max(0, configRoot.playbackVisibilityOptions.findIndex((option) => {
+                    return option.value === mode;
+                }));
+            }
+            onActivated: configRoot.cfg_playbackButtonsMode = currentValue
+        }
+
+        QQC2.ComboBox {
+            Kirigami.FormData.label: i18n("Seek bar:")
+            model: configRoot.playbackVisibilityOptions
+            textRole: "text"
+            valueRole: "value"
+            currentIndex: Math.max(0, configRoot.playbackVisibilityOptions.findIndex((option) => {
+                return option.value === configRoot.cfg_seekBarMode;
+            }))
+            onActivated: configRoot.cfg_seekBarMode = currentValue
         }
 
         SectionHeader {

@@ -1,3 +1,4 @@
+import "PlayerSource.js" as PlayerSource
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Dialogs as Dialogs
@@ -76,7 +77,7 @@ KCM.SimpleKCM {
         "value": "hidden"
     }]
     readonly property bool hasSourcePriorityEntries: sourcePriorityField.text.split(",").some((entry) => {
-        return normalizeDesktopEntry(entry).length > 0;
+        return entry.trim().length > 0;
     })
 
     function syncComboByValue(comboBox, options, configuredValue, fallbackValue) {
@@ -94,24 +95,20 @@ KCM.SimpleKCM {
         return options[resolvedIndex].value;
     }
 
-    function normalizeDesktopEntry(value) {
-        return (value || "").toString().trim();
-    }
-
     function refreshDetectedSources() {
         const sources = [];
-        const seen = {
-        };
+        const seen = new Set();
         const playerCount = detectedSourcesModel.rowCount();
         for (let row = 0; row < playerCount; ++row) {
             const player = detectedSourcesModel.data(detectedSourcesModel.index(row, 0), containerRole);
-            const desktopEntry = normalizeDesktopEntry(player ? player.desktopEntry : "");
-            const desktopEntryKey = desktopEntry.toLowerCase();
-            if (!desktopEntry || seen[desktopEntryKey])
+            const sourceName = PlayerSource.sourceName(player);
+            const sourceKey = sourceName.toLowerCase();
+            // shortcut: comma-containing names need escaping if the priority syntax gains it.
+            if (!sourceKey || sourceKey.includes(",") || seen.has(sourceKey))
                 continue;
 
-            seen[desktopEntryKey] = true;
-            sources.push(desktopEntry);
+            seen.add(sourceKey);
+            sources.push(sourceName);
         }
         detectedSources = sources;
     }
@@ -261,7 +258,7 @@ KCM.SimpleKCM {
             Layout.preferredHeight: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2)
             textFormat: TextEdit.PlainText
             wrapMode: TextEdit.WrapAnywhere
-            text: configRoot.detectedSources.length > 0 ? configRoot.detectedSources.join("\n") : i18n("No active MPRIS desktopEntry values detected")
+            text: configRoot.detectedSources.length > 0 ? configRoot.detectedSources.join("\n") : i18n("No active MPRIS source names detected")
         }
 
         QQC2.SpinBox {

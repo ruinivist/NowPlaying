@@ -4,6 +4,7 @@ Credits: https://github.com/ccatterina/plasmusic-toolbar
 looked handy, ty
 */
 
+import "PlayerSource.js" as PlayerSource
 import QtQml.Models
 import QtQuick
 import org.kde.plasma.private.mpris as Mpris
@@ -23,7 +24,7 @@ QtObject {
         if (!resolvedPlayer)
             return false;
 
-        return sourceName === "any" || entriesMatch(resolvedPlayer.desktopEntry, sourceName);
+        return sourceName === "any" || entriesMatch(PlayerSource.sourceName(resolvedPlayer), sourceName);
     }
     readonly property string artists: ready ? resolvedPlayer.artist : ""
     readonly property string title: ready ? resolvedPlayer.track : ""
@@ -82,7 +83,7 @@ QtObject {
         const playerCount = mpris2Model.rowCount();
         for (let row = 0; row < playerCount; ++row) {
             const player = playerAt(row);
-            if (player && entriesMatch(player.desktopEntry, targetEntry))
+            if (entriesMatch(PlayerSource.sourceName(player), targetEntry))
                 return player;
 
         }

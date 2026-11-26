@@ -28,6 +28,7 @@ QtObject {
     }
     readonly property string artists: ready ? resolvedPlayer.artist : ""
     readonly property string title: ready ? resolvedPlayer.track : ""
+    readonly property string album: ready ? (resolvedPlayer.album || "").trim() : ""
     readonly property int playbackStatus: ready ? resolvedPlayer.playbackStatus : Mpris.PlaybackStatus.Unknown
     readonly property int shuffle: ready ? resolvedPlayer.shuffle : Mpris.ShuffleStatus.Unknown
     readonly property string artUrl: ready ? resolvedPlayer.artUrl : ""

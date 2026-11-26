@@ -16,6 +16,10 @@ KCM.SimpleKCM {
     property alias cfg_labelFontSize: labelFontSizeSpinBox.value
     property alias cfg_titleFontSize: titleFontSizeSpinBox.value
     property alias cfg_artistFontSize: artistFontSizeSpinBox.value
+    property string cfg_albumVisibilityMode
+    property alias cfg_titleColor: titleColorRow.text
+    property alias cfg_artistColor: artistColorRow.text
+    property alias cfg_albumColor: albumColorRow.text
     property string cfg_labelVisibilityMode
     property string cfg_labelPlacement
     property alias cfg_labelText: labelTextArea.text
@@ -414,6 +418,45 @@ KCM.SimpleKCM {
             to: 96
         }
 
+        QQC2.ComboBox {
+            Kirigami.FormData.label: i18n("Album name:")
+            model: [{
+                "text": i18n("Never show"),
+                "value": "hidden"
+            }, {
+                "text": i18n("Show when different from title"),
+                "value": "different"
+            }, {
+                "text": i18n("Always show"),
+                "value": "always"
+            }]
+            textRole: "text"
+            valueRole: "value"
+            currentIndex: Math.max(0, indexOfValue(configRoot.cfg_albumVisibilityMode))
+            onActivated: configRoot.cfg_albumVisibilityMode = currentValue
+        }
+
+        TrackColorRow {
+            id: titleColorRow
+
+            Kirigami.FormData.label: i18n("Title color:")
+            foregroundColor: configRoot.cfg_foregroundColor
+        }
+
+        TrackColorRow {
+            id: artistColorRow
+
+            Kirigami.FormData.label: i18n("Artist color:")
+            foregroundColor: configRoot.cfg_foregroundColor
+        }
+
+        TrackColorRow {
+            id: albumColorRow
+
+            Kirigami.FormData.label: i18n("Album color:")
+            foregroundColor: configRoot.cfg_foregroundColor
+        }
+
         QQC2.SpinBox {
             id: trackTextVerticalSpacingSpinBox
 
@@ -456,6 +499,42 @@ KCM.SimpleKCM {
         onModelReset: configRoot.refreshDetectedSources()
         onDataChanged: configRoot.refreshDetectedSources()
         Component.onCompleted: configRoot.refreshDetectedSources()
+    }
+
+    component TrackColorRow: RowLayout {
+        id: colorRow
+
+        required property string foregroundColor
+        property alias text: colorField.text
+
+        QQC2.TextField {
+            id: colorField
+
+            Layout.fillWidth: true
+            placeholderText: i18n("Use foreground color")
+        }
+
+        QQC2.Button {
+            text: i18n("Pick...")
+            onClicked: {
+                const fallback = colorRow.foregroundColor.trim() || "white";
+                try {
+                    colorDialog.selectedColor = Qt.color(colorField.text.trim() || fallback);
+                } catch (error) {
+                    colorDialog.selectedColor = fallback;
+                }
+                colorDialog.open();
+            }
+        }
+
+        Dialogs.ColorDialog {
+            id: colorDialog
+
+            title: i18n("Select text color")
+            options: Dialogs.ColorDialog.ShowAlphaChannel
+            onAccepted: colorField.text = selectedColor.toString()
+        }
+
     }
 
     component SectionHeader: Item {

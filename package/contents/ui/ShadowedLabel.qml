@@ -6,6 +6,7 @@ Item {
     id: shadowedLabel
 
     property alias text: foregroundLabel.text
+    property alias textFormat: foregroundLabel.textFormat
     property alias font: foregroundLabel.font
     property alias lineHeight: foregroundLabel.lineHeight
     property alias elide: foregroundLabel.elide
@@ -13,11 +14,13 @@ Item {
     property alias verticalAlignment: foregroundLabel.verticalAlignment
     property alias color: foregroundLabel.color
     property bool shadowEnabled: false
-    readonly property real contentWidth: width > 0 ? width : foregroundLabel.implicitWidth
+    property real trailingSpace: 0
+    readonly property real contentWidth: Math.max(0, (width > 0 ? width : foregroundLabel.implicitWidth) - trailingSpace)
     readonly property real contentHeight: height > 0 ? height : foregroundLabel.implicitHeight
 
     implicitWidth: foregroundLabel.implicitWidth
     implicitHeight: foregroundLabel.implicitHeight
+    baselineOffset: foregroundLabel.baselineOffset
 
     PlasmaComponents.Label {
         id: shadowSourceLabel
@@ -26,6 +29,7 @@ Item {
         width: shadowedLabel.contentWidth
         height: shadowedLabel.contentHeight
         text: foregroundLabel.text
+        textFormat: foregroundLabel.textFormat
         font: foregroundLabel.font
         lineHeight: foregroundLabel.lineHeight
         elide: foregroundLabel.elide

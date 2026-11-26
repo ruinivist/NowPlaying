@@ -12,6 +12,10 @@ Item {
     property int configuredLabelFontSize: 16
     property int configuredTitleFontSize: 28
     property int configuredArtistFontSize: 26
+    property string configuredAlbumVisibilityMode: "hidden"
+    property string configuredTitleColor: ""
+    property string configuredArtistColor: ""
+    property string configuredAlbumColor: ""
     property string configuredLabelVisibilityMode: "auto"
     property string configuredLabelPlacement: "left"
     property string configuredLabelText: "NOW\nPLAYING"
@@ -183,6 +187,14 @@ Item {
 
     function seekSnapshotMatches(snapshot) {
         return snapshot && snapshot.player === root.player.resolvedPlayer && snapshot.title === root.player.title && snapshot.artist === root.player.artists && snapshot.length === root.player.songLength && snapshot.artUrl === root.player.artUrl;
+    }
+
+    function textColorOverride(value: string): var {
+        try {
+            return value.trim() ? Qt.color(value.trim()) : null;
+        } catch (error) {
+            return null;
+        }
     }
 
     function commitSeek(seconds, snapshot) {
@@ -432,7 +444,7 @@ Item {
                     font.bold: true
                     font.italic: root.configuredTrackTextItalic
                     font.family: root.configuredFontFamily
-                    color: root.effectiveForegroundColor
+                    color: root.textColorOverride(root.configuredTitleColor) || root.effectiveForegroundColor
                     lineHeight: 0.8
                     elide: Text.ElideRight
                     horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
@@ -449,10 +461,44 @@ Item {
                     font.pixelSize: Math.max(1, Math.round(root.effectiveArtistFontSize * root.seekTextFitScale))
                     font.italic: root.configuredTrackTextItalic
                     font.family: root.configuredFontFamily
-                    color: root.effectiveForegroundColor
+                    color: root.textColorOverride(root.configuredArtistColor) || root.effectiveForegroundColor
                     lineHeight: 0.8
                     elide: Text.ElideRight
                     horizontalAlignment: root.labelsOnRight ? Text.AlignRight : Text.AlignLeft
+                    trailingSpace: root.labelsOnRight ? albumLabel.width : 0
+
+                    ShadowedLabel {
+                        id: albumLabel
+
+                        readonly property real artistWidth: Math.min(artistLabel.width, artistLabel.implicitWidth)
+                        readonly property real rowEnd: seekTime.visible && seekTime.intersectsLine(artistLabel) ? seekTime.x - artistLabel.x - 4 : artistLabel.width
+                        readonly property var colorOverride: root.textColorOverride(root.configuredAlbumColor)
+
+                        objectName: "albumLabel"
+                        anchors.baseline: artistLabel.baseline
+                        x: root.labelsOnRight ? rowEnd - width : artistWidth
+                        width: text.length > 0 ? Math.max(0, Math.min(implicitWidth, rowEnd - artistWidth)) : 0
+                        visible: width > 0
+                        text: {
+                            const mode = root.configuredAlbumVisibilityMode;
+                            if (mode !== "always" && mode !== "different")
+                                return "";
+
+                            const album = (root.player.album || "").replace(/[\r\n\u0085\u2028\u2029]+/g, " ").trim();
+                            if (mode === "different" && album.toLowerCase() === (root.player.title || "").trim().toLowerCase())
+                                return "";
+
+                            return album && artistLabel.text.trim() ? "\u00a0·\u00a0" + album : album;
+                        }
+                        textFormat: Text.PlainText
+                        font.pixelSize: Math.max(1, Math.round(artistLabel.font.pixelSize * 0.8))
+                        font.italic: artistLabel.font.italic
+                        font.family: artistLabel.font.family
+                        color: colorOverride || root.effectiveForegroundColor
+                        opacity: colorOverride ? 1 : 0.7
+                        shadowEnabled: artistLabel.shadowEnabled
+                        elide: Text.ElideRight
+                    }
                 }
             }
 
@@ -560,9 +606,13 @@ Item {
                 font.italic: true
                 textFormat: Text.PlainText
 
-                function overlaps(label) {
+                function intersectsLine(label) {
                     const labelTop = infoColumn.y + label.y;
-                    return label.text.length > 0 && y < labelTop + label.height && y + height > labelTop && (root.labelsOnRight || x < label.x + Math.min(label.width, label.implicitWidth) + 4);
+                    return y < labelTop + label.height && y + height > labelTop;
+                }
+
+                function overlaps(label) {
+                    return label.text.length > 0 && intersectsLine(label) && (root.labelsOnRight || x < label.x + Math.min(label.width, label.implicitWidth) + 4);
                 }
             }
         }

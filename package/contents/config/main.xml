@@ -29,6 +29,22 @@
             <label>Track artist font size</label>
             <default>26</default>
         </entry>
+        <entry name="albumVisibilityMode" type="String">
+            <label>Album name visibility</label>
+            <default>hidden</default>
+        </entry>
+        <entry name="titleColor" type="String">
+            <label>Track title color</label>
+            <default></default>
+        </entry>
+        <entry name="artistColor" type="String">
+            <label>Artist color</label>
+            <default></default>
+        </entry>
+        <entry name="albumColor" type="String">
+            <label>Album color</label>
+            <default></default>
+        </entry>
         <entry name="labelVisibilityMode" type="String">
             <label>Now Playing label visibility mode</label>
             <default>auto</default>

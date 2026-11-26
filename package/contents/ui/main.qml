@@ -23,6 +23,14 @@ PlasmoidItem {
     // qmllint disable missing-property
     property int configuredArtistFontSize: plasmoid.configuration.artistFontSize
     // qmllint disable missing-property
+    property string configuredAlbumVisibilityMode: plasmoid.configuration.albumVisibilityMode
+    // qmllint disable missing-property
+    property string configuredTitleColor: plasmoid.configuration.titleColor
+    // qmllint disable missing-property
+    property string configuredArtistColor: plasmoid.configuration.artistColor
+    // qmllint disable missing-property
+    property string configuredAlbumColor: plasmoid.configuration.albumColor
+    // qmllint disable missing-property
     property string configuredLabelVisibilityMode: plasmoid.configuration.labelVisibilityMode
     // qmllint disable missing-property
     // qmllint disable missing-property
@@ -127,6 +135,10 @@ PlasmoidItem {
         configuredLabelFontSize: root.configuredLabelFontSize
         configuredTitleFontSize: root.configuredTitleFontSize
         configuredArtistFontSize: root.configuredArtistFontSize
+        configuredAlbumVisibilityMode: root.configuredAlbumVisibilityMode
+        configuredTitleColor: root.configuredTitleColor
+        configuredArtistColor: root.configuredArtistColor
+        configuredAlbumColor: root.configuredAlbumColor
         configuredLabelVisibilityMode: root.configuredLabelVisibilityMode
         configuredLabelPlacement: root.configuredLabelPlacement
         configuredLabelText: root.configuredLabelText
@@ -170,6 +182,10 @@ PlasmoidItem {
         configuredLabelFontSize: root.configuredLabelFontSize
         configuredTitleFontSize: root.configuredTitleFontSize
         configuredArtistFontSize: root.configuredArtistFontSize
+        configuredAlbumVisibilityMode: root.configuredAlbumVisibilityMode
+        configuredTitleColor: root.configuredTitleColor
+        configuredArtistColor: root.configuredArtistColor
+        configuredAlbumColor: root.configuredAlbumColor
         configuredLabelVisibilityMode: root.configuredLabelVisibilityMode
         configuredLabelPlacement: root.configuredLabelPlacement
         configuredLabelText: root.configuredLabelText

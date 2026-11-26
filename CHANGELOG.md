@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.0] - Album names and player detection
+
+- Adds optional inline album names and separate title, artist, and album colors.
+- Fixes source matching for players without a desktop entry.
+
 ## [1.6.1] - Qt compatibility
 
 - Builds the visualizer plugin with Qt 6.4 so NowPlaying can load on Debian 13.

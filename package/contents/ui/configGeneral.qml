@@ -113,7 +113,7 @@ KCM.SimpleKCM {
                 continue;
 
             seen.add(sourceKey);
-            sources.push(sourceName);
+            sources.push(sourceName.charAt(0).toUpperCase() + sourceName.slice(1));
         }
         detectedSources = sources;
     }

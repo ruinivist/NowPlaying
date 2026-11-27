@@ -13,6 +13,8 @@ PlasmoidItem {
     // qmllint disable missing-property
     property int configuredOpacity: plasmoid.configuration.opacity
     // qmllint disable missing-property
+    property bool configuredDesktopMenuOnRightClick: plasmoid.configuration.desktopMenuOnRightClick
+    // qmllint disable missing-property
     property string configuredFontFamily: plasmoid.configuration.fontFamily
     // qmllint disable missing-property
     property bool configuredTrackTextItalic: plasmoid.configuration.trackTextItalic
@@ -110,6 +112,23 @@ PlasmoidItem {
     Layout.minimumHeight: Kirigami.Units.gridUnit * 5 + root.visualizerReservedHeight
     Plasmoid.backgroundHints: resolvedBackgroundHints
     opacity: configuredOpacity / 100
+
+    // Plasma checks the plasmoid's hit area to choose the context menu.
+    Binding {
+        target: root
+        property: "containmentMask"
+        value: emptyHitArea
+        when: {
+            const containment = Plasmoid.containment;
+            return root.configuredDesktopMenuOnRightClick && containment?.containmentType === Containment.Desktop && containment.corona && !containment.corona.editMode;
+        }
+    }
+
+    Item {
+        id: emptyHitArea
+
+        visible: false
+    }
 
     Native.CavaSource {
         id: cavaAvailability

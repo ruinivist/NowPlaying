@@ -11,6 +11,7 @@ KCM.SimpleKCM {
     id: configRoot
 
     property alias cfg_opacity: opacitySpinBox.value
+    property alias cfg_desktopMenuOnRightClick: desktopMenuOnRightClickCheckBox.checked
     property string cfg_fontFamily
     property alias cfg_trackTextItalic: trackTextItalicCheckBox.checked
     property alias cfg_labelFontSize: labelFontSizeSpinBox.value
@@ -471,6 +472,22 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Separator gap from track:")
             from: 0
             to: 24
+        }
+
+        SectionHeader {
+            title: i18n("Misc")
+        }
+
+        QQC2.CheckBox {
+            id: desktopMenuOnRightClickCheckBox
+
+            text: i18n("Show the desktop menu on right-click")
+        }
+
+        QQC2.Label {
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
+            text: i18n("Replaces the widget’s right-click menu. Use desktop Edit Mode to reopen widget settings.")
         }
 
     }

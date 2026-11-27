@@ -9,6 +9,10 @@
             <label>Opacity</label>
             <default>100</default>
         </entry>
+        <entry name="desktopMenuOnRightClick" type="Bool">
+            <label>Show the desktop menu on right-click</label>
+            <default>false</default>
+        </entry>
         <entry name="fontFamily" type="String">
             <label>Font family</label>
             <default>Noto Sans</default>
